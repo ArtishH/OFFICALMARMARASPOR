@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marmaraspor Kulübü | Resmi Web Sitesi</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            400: '#F4D03F', 
+                            500: '#D4AF37', 
+                            600: '#B7950B', 
+                            700: '#7D6608',
+                            800: '#584600',
+                        },
+                        onyx: {
+                            700: '#3f3f46', 
+                            800: '#27272a', 
+                            900: '#18181b', 
+                            950: '#09090b', 
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(212, 175, 55, 0.5)',
+                        'glow-strong': '0 0 35px rgba(212, 175, 55, 0.7)',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Scrollbar Özelleştirmesi (Webkit & Standard) */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: #52525b #18181b;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #18181b; }
+        ::-webkit-scrollbar-thumb { background: #52525b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
+        
+        /* Slider Geçişleri */
+        .slide {
+            opacity: 0;
+            transition: opacity 1500ms ease-in-out;
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+        }
+        .slide.active { opacity: 1; z-index: 20; }
+        
+        .slide-bg {
+            width: 100%; height: 100%;
+            background-size: cover; background-position: center;
+            transform: scale(1);
+            transition: transform 10s ease-out;
+        }
+        .slide.active .slide-bg { transform: scale(1.1); }
+
+        .slider-content {
+            opacity: 0; transform: translateY(30px);
+            transition: all 1000ms ease-out 500ms;
+        }
+        .slide.active .slider-content { opacity: 1; transform: translateY(0); }
+
+        /* NAV LINK EFEKTİ */
+        .nav-item {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .nav-item:hover::before {
+            left: 100%;
+        }
+
+        .nav-link-text {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* TEXT GRADIENT METALİK (Webkit Fix) */
+        .text-gradient-gold {
+            background: linear-gradient(to bottom, #F4D03F 0%, #D4AF37 50%, #B7950B 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            /* Standart text-fill-color henüz yaygın değil, color fallback verelim */
+            color: #D4AF37; 
+            /* Ancak -webkit-text-fill-color transparent olduğu için bu renk görünmeyecek, sadece desteklemeyen tarayıcılar için */
+        }
+        /* Gradient destekleyen tarayıcılarda transparent yap */
+        @supports (-webkit-background-clip: text) or (background-clip: text) {
+            .text-gradient-gold {
+                color: transparent;
+                text-shadow: 0px 2px 4px rgba(0,0,0,0.3);
+            }
+        }
+
+        /* SPONSOR KART */
+        .sponsor-card {
+            background: rgba(39, 39, 42, 0.4);
+            border: 1px solid rgba(82, 82, 91, 0.2);
+            backdrop-filter: blur(5px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sponsor-card:hover {
+            background: rgba(39, 39, 42, 0.8);
+            border-color: rgba(212, 175, 55, 0.4);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.6), 0 0 20px rgba(212, 175, 55, 0.1);
+        }
+
+        .sponsor-logo-img {
+            filter: grayscale(100%) brightness(130%) contrast(0.6);
+            opacity: 0.7;
+            transition: all 0.4s ease;
+        }
+
+        .sponsor-card:hover .sponsor-logo-img {
+            filter: grayscale(0%) brightness(100%) contrast(1);
+            opacity: 1;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-onyx-900 text-gray-300 font-sans selection:bg-gold-500 selection:text-onyx-900 overflow-x-hidden">
+
+    <!-- Navbar -->
+    <!-- border-b-2 border-gold-500 eklendi: Sabit sarı çizgi -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-500 border-b-2 border-gold-500 shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+        <div id="navbar-bg" class="absolute inset-0 bg-gradient-to-b from-black/90 to-transparent transition-all duration-500 -z-10"></div>
+
+        <div class="container mx-auto px-6">
+            <div class="flex justify-between items-center transition-all duration-500 py-6" id="navbar-container">
+                
+                <!-- Logo & Branding -->
+                <a href="#home" class="flex items-center gap-5 group relative">
+                    <div class="absolute inset-0 bg-gold-500/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                    <div class="relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                        <img id="nav-logo" src="https://i.hizliresim.com/pxf3135.png" alt="Marmaraspor Logo" class="w-20 h-20 object-contain drop-shadow-glow filter transition-all duration-500">
+                    </div>
+                    <div class="flex flex-col justify-center relative z-10">
+                        <h1 class="font-heading font-black text-4xl leading-[0.85] tracking-tight group-hover:scale-105 transition-transform origin-left">
+                            <span class="text-gradient-gold block drop-shadow-lg">MARMARA</span>
+                        </h1>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="h-[1px] w-4 bg-gold-500/80"></span>
+                            <span class="text-[0.65rem] font-bold tracking-[0.4em] text-gray-300 uppercase group-hover:text-white transition-colors">Spor Kulübü</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-1">
+                    
+                    <!-- Anasayfa Linki Eklendi -->
+                    <a href="index.html" class="nav-item px-6 py-3 rounded-lg text-sm font-bold uppercase tracking-widest text-gray-200 hover:text-white transition-all group hover:bg-white/5 border border-transparent hover:border-gold-500/30">
+                        <span class="nav-link-text group-hover:text-gold-400 transition-colors">Anasayfa</span>
+                    </a>
+
+                    <div class="relative group h-full">
+                        <button class="nav-item px-6 py-3 rounded-lg text-sm font-bold uppercase tracking-widest text-gray-200 hover:text-white transition-all flex items-center gap-2 group-hover:bg-white/5 border border-transparent hover:border-gold-500/30">
+                            <span class="nav-link-text">Kulüp</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-gold-500 transition-transform group-hover:rotate-180"></i>
+                        </button>
+                        <div class="absolute top-full right-0 w-56 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform -translate-y-2 group-hover:translate-y-0">
+                            <div class="bg-onyx-900/95 backdrop-blur-xl border border-gold-500/30 shadow-glow rounded-xl overflow-hidden">
+                                <a href="Kulup/Kadro/index.html" class="block px-6 py-4 text-xs font-bold text-gray-400 hover:text-gold-500 hover:bg-white/5 tracking-[0.2em] uppercase transition-colors border-b border-gray-800 flex items-center justify-between group/item">
+                                    Kadro
+                                    <i data-lucide="users" class="w-4 h-4 opacity-0 group-hover/item:opacity-100 transition-opacity text-gold-500"></i>
+                                </a>
+                                <a href="Kulup/Muze/index.html" class="block px-6 py-4 text-xs font-bold text-gray-400 hover:text-gold-500 hover:bg-white/5 tracking-[0.2em] uppercase transition-colors flex items-center justify-between group/item">
+                                    Müze
+                                    <i data-lucide="trophy" class="w-4 h-4 opacity-0 group-hover/item:opacity-100 transition-opacity text-gold-500"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="haber/index.html" class="nav-item px-6 py-3 rounded-lg text-sm font-bold uppercase tracking-widest text-gray-200 hover:text-white transition-all group hover:bg-white/5 border border-transparent hover:border-gold-500/30">
+                        <span class="nav-link-text group-hover:text-gold-400 transition-colors">Haber</span>
+                    </a>
+                    
+                    <a href="magaza/index.html" class="ml-4 px-8 py-3 bg-gradient-to-r from-gold-600 to-gold-400 text-onyx-900 text-sm font-black uppercase tracking-widest rounded skew-x-[-10deg] hover:skew-x-0 hover:scale-105 transition-all shadow-[0_0_20px_rgba(212,175,55,0.4)] hover:shadow-[0_0_30px_rgba(212,175,55,0.6)]">
+                        <div class="skew-x-[10deg] group-hover:skew-x-0 flex items-center gap-2">
+                            Mağaza
+                            <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Mobile Btn -->
+                <button id="mobile-menu-btn" class="md:hidden text-gray-100 hover:text-gold-500 transition-colors p-2">
+                    <i data-lucide="menu" class="w-8 h-8 drop-shadow-md"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="fixed inset-0 bg-onyx-950/98 backdrop-blur-2xl z-40 transform translate-x-full transition-transform duration-500 flex flex-col items-center justify-center space-y-8 md:hidden">
+            <button id="close-menu-btn" class="absolute top-8 right-8 text-gray-400 hover:text-gold-500 transition-colors bg-white/5 p-2 rounded-full"><i data-lucide="x" class="w-8 h-8"></i></button>
+            <div class="text-center mb-8">
+                <img src="https://i.hizliresim.com/pxf3135.png" alt="Logo" class="w-20 h-20 mx-auto mb-4 drop-shadow-glow">
+                <h2 class="text-2xl font-heading font-black text-gradient-gold">MARMARA</h2>
+            </div>
+            <nav class="flex flex-col items-center gap-6 w-full px-8">
+                <!-- Mobile Anasayfa Linki -->
+                <a href="index.html" class="w-full text-center py-4 border-b border-gray-800 text-xl font-heading font-bold text-white hover:text-gold-500 transition-colors tracking-widest">ANASAYFA</a>
+                <a href="Kulup/Kadro/index.html" class="w-full text-center py-4 border-b border-gray-800 text-xl font-heading font-bold text-white hover:text-gold-500 transition-colors tracking-widest">KADRO</a>
+                <a href="Kulup/Muze/index.html" class="w-full text-center py-4 border-b border-gray-800 text-xl font-heading font-bold text-white hover:text-gold-500 transition-colors tracking-widest">MÜZE</a>
+                <a href="haber/index.html" class="w-full text-center py-4 border-b border-gray-800 text-xl font-heading font-bold text-white hover:text-gold-500 transition-colors tracking-widest">HABER</a>
+                <a href="magaza/index.html" class="w-full text-center py-4 bg-gold-500 text-onyx-900 font-black text-xl rounded mt-4 hover:bg-gold-400 transition-colors shadow-glow">MAĞAZA</a>
+            </nav>
+        </div>
+    </nav>
+
+    <!-- HERO / SLIDER SECTION -->
+    <section id="home" class="relative h-screen w-full overflow-hidden bg-onyx-900">
+        <div class="slide active">
+            <div class="slide-bg" style="background-image: linear-gradient(to top, rgba(24, 24, 27, 0.8), rgba(24, 24, 27, 0.2)), url('https://i.hizliresim.com/gx7fdxi.png');"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="text-center px-2 slider-content mt-10">
+                    <span class="text-gold-400 text-sm md:text-base font-bold tracking-[0.5em] uppercase border-b border-gold-500/50 pb-2 mb-4 inline-block shadow-black drop-shadow-md">2025/2026 Sezonu</span>
+                    <h1 class="font-heading text-2xl md:text-5xl font-black text-gray-100 mb-6 tracking-tighter drop-shadow-2xl">
+                         MARMARASPORA ÖZEL KOLA TASARIMLARI!<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-gold-200 to-gold-600 drop-shadow-glow"> SARIYER KOLA X COCA COLA</span>
+                    </h1>
+                </div>
+            </div>
+        </div>
+        <div class="slide">
+            <div class="slide-bg" style="background-image: linear-gradient(to right, rgba(24, 24, 27, 0.95), rgba(24, 24, 27, 0.4)), url('https://i.hizliresim.com/pi1il21.png');"></div>
+             <div class="absolute inset-0 flex items-center justify-center">
+                <div class="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center slider-content mt-20">
+                    <div class="text-left">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="bg-gold-500 text-onyx-900 text-xs font-black px-3 py-1 uppercase tracking-wider transform -skew-x-12">Resmi Sponsor</span>
+                        </div>
+                        <h2 class="font-heading text-5xl md:text-7xl font-black text-gray-100 mb-4 leading-tight drop-shadow-xl">
+                            KALİTELİ <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-gold-700">GİYİM</span>
+                        </h2>
+                        <p class="text-gray-300 text-lg mb-8 max-w-md font-light border-l-4 border-gold-500 pl-4">
+                            Kulübümüz Marmaraspor’un yeni sponsorları Adidas ve Nike artık MarmaraStore’da!
+Gel, sen de kaliteli giyin; hem de %50 indirimle.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slide">
+              <div class="slide-bg" style="background-image: linear-gradient(to top, rgba(24, 24, 27, 0.9), rgba(24, 24, 27, 0.2)), url('https://i.hizliresim.com/glkjcik.png');"></div>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="text-center px-6 slider-content mt-20">
+                    <div class="inline-block p-4 rounded-full border-2 border-gold-500/30 bg-black/20 backdrop-blur-md mb-6 animate-pulse-slow">
+                        <i data-lucide="" class="w-16 h-16 text-gold-500"></i>
+                    </div>
+                    <h2 class="font-heading text-5xl md:text-8xl font-black text-gray-100 mb-6 drop-shadow-2xl">MARMARASPOR AKADEMİ</h2>
+                    <p class="text-xl text-gray-300 tracking-widest uppercase mb-10 font-bold">Marmaraspor Akademisi artık hizmette! Hayallerin için ilk adımı at. </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute bottom-0 left-0 h-1 bg-gray-800 w-full z-30">
+            <div id="progress-bar" class="h-full bg-gradient-to-r from-gold-600 to-gold-400 w-0 shadow-[0_0_10px_rgba(212,175,55,0.8)]"></div>
+        </div>
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex gap-4 z-30">
+            <button onclick="goToSlide(0)" class="w-12 h-1 bg-gray-500/50 hover:bg-gold-500 transition-all indicator active-indicator"></button>
+            <button onclick="goToSlide(1)" class="w-12 h-1 bg-gray-500/50 hover:bg-gold-500 transition-all indicator"></button>
+            <button onclick="goToSlide(2)" class="w-12 h-1 bg-gray-500/50 hover:bg-gold-500 transition-all indicator"></button>
+        </div>
+    </section>
+
+    <!-- SHOP TEASER -->
+    <section id="shop" class="h-[60vh] bg-onyx-800 relative flex items-center border-t border-gray-700">
+        <div class="absolute inset-0 bg-[url('https://i.hizliresim.com/tbpklrv.png')] bg-cover bg-center opacity-25 mix-blend-luminosity"></div>
+        <div class="container mx-auto px-6 relative z-10 text-center">
+             <h2 class="font-heading text-5xl md:text-7xl font-black text-gray-100 mb-6 drop-shadow-lg"></h2>
+             <a href="magaza/index.html" class="inline-block group relative px-12 py-4 border border-gold-500/50 text-gold-500 font-bold tracking-[0.3em] overflow-hidden hover:text-onyx-900 transition-colors duration-300">
+                <span class="absolute inset-0 bg-gold-500 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-in-out"></span>
+                <span class="relative z-10">MAĞAZAYA GİT</span>
+             </a>
+        </div>
+    </section>
+
+    <!-- SPONSORS SECTION -->
+    <section class="py-24 bg-gradient-to-b from-onyx-900 via-onyx-800 to-onyx-900 relative overflow-hidden border-t border-gray-800">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gold-500/5 blur-[100px] rounded-full pointer-events-none"></div>
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 mix-blend-overlay"></div>
+
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center gap-4 text-gold-500/60 mb-4">
+                    <span class="h-px w-16 bg-gradient-to-r from-transparent to-gold-500"></span>
+                    <span class="text-xs font-bold tracking-[0.5em] uppercase text-gold-400">Gücümüze Güç Katanlar</span>
+                    <span class="h-px w-16 bg-gradient-to-l from-transparent to-gold-500"></span>
+                </div>
+                <h3 class="text-3xl md:text-4xl font-heading font-light text-gray-200 uppercase tracking-widest drop-shadow-xl">
+                    Resmi İş Ortakları
+                </h3>
+            </div>
+            
+            <div class="flex justify-center mb-16">
+                <div class="block w-full max-w-xl group">
+                    <div class="sponsor-card rounded-2xl p-8 md:p-12 flex items-center justify-center animate-pulse-slow hover:animate-none border border-white/5">
+                        <div class="absolute inset-0 bg-gold-500/5 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                        <img src="https://sariyericecek.com.tr/assets/img/site_logo.png" alt="Ana Sponsor" class="sponsor-logo-img w-full h-auto max-h-32 object-contain relative z-10">
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+                <div class="sponsor-card rounded-xl p-8 flex items-center justify-center h-40 group">
+                    <img src="https://www.edigitalagency.com.au/wp-content/uploads/new-Nike-logo-white-png-large-size.png" alt="Nike" class="sponsor-logo-img w-full h-full object-contain">
+                </div>
+                <div class="sponsor-card rounded-xl p-8 flex items-center justify-center h-40 group">
+                    <img src="https://www.pngarts.com/files/4/Adidas-Logo-PNG-Free-Download.png" alt="Adidas" class="sponsor-logo-img w-full h-full object-contain">
+                </div>
+                <div class="sponsor-card rounded-xl p-8 flex items-center justify-center h-40 group">
+                    <img src="https://vectorseek.com/wp-content/uploads/2023/09/Uludag-Logo-Vector.svg-.png" alt="Uludag" class="sponsor-logo-img w-full h-full object-contain">
+                </div>
+                <div class="sponsor-card rounded-xl p-8 flex items-center justify-center h-40 group">
+                    <img src="https://www.pizzabulls.com/images/pizzabullslogo.png" alt="Pizza Bulls" class="sponsor-logo-img w-full h-full object-contain">
+                </div>
+                 <div class="sponsor-card rounded-xl p-8 flex items-center justify-center h-40 group">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Coca-Cola_logo.svg/2560px-Coca-Cola_logo.svg.png" alt="Coca Cola" class="sponsor-logo-img w-full h-full object-contain">
+                </div>
+                 <div class="sponsor-card rounded-xl p-8 flex items-center justify-center h-40 group">
+                    <img src="https://upload.wikimedia.org/wikipedia/tr/a/a7/Eti_logosu.jpg" alt="Eti" class="sponsor-logo-img w-full h-full object-contain">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-onyx-950 border-t border-gold-500/20 pt-16 pb-8 relative">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold-500/50 to-transparent"></div>
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-12">
+                <a href="#" class="flex items-center gap-4 group">
+                    <img src="https://i.hizliresim.com/pxf3135.png" alt="Marmaraspor Logo" class="w-16 h-16 object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500">
+                    <div class="flex flex-col">
+                        <!-- Yazı fontu güncellendi: font-black ve gradient efekt -->
+                         <span class="font-heading font-black text-2xl tracking-tight text-gradient-gold drop-shadow-md">MARMARA</span>
+                         <span class="text-[10px] tracking-widest text-gold-500 uppercase">Spor Kulübü</span>
+                    </div>
+                </a>
+                
+                <!-- Sosyal Medya İkonları Kaldırıldı -->
+                <div class="hidden"></div> 
+            </div>
+            <div class="text-center text-gray-600 text-xs tracking-widest border-t border-gray-900 pt-8">© 2025 MARMARASPOR KULÜBÜ.</div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // NAVBAR SCROLL & RESIZE LOGIC
+        const navbar = document.getElementById('navbar');
+        const navbarBg = document.getElementById('navbar-bg');
+        const navbarContainer = document.getElementById('navbar-container');
+        const navLogo = document.getElementById('nav-logo');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                // SCROLLED DOWN STATE
+                // Border manipülasyonu kaldırıldı, sabit border var. Sadece arka plan değişiyor.
+                navbarBg.classList.remove('bg-gradient-to-b', 'from-black/90', 'to-transparent');
+                navbarBg.classList.add('bg-onyx-950/90', 'backdrop-blur-xl', 'shadow-lg');
+                navbarContainer.classList.remove('py-6');
+                navbarContainer.classList.add('py-3');
+                navLogo.classList.remove('w-20', 'h-20');
+                navLogo.classList.add('w-14', 'h-14');
+            } else {
+                // TOP STATE
+                navbarBg.classList.add('bg-gradient-to-b', 'from-black/90', 'to-transparent');
+                navbarBg.classList.remove('bg-onyx-950/90', 'backdrop-blur-xl', 'shadow-lg');
+                navbarContainer.classList.add('py-6');
+                navbarContainer.classList.remove('py-3');
+                navLogo.classList.add('w-20', 'h-20');
+                navLogo.classList.remove('w-14', 'h-14');
+            }
+        });
+
+        // Mobile Menu
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        function toggleMenu() { mobileMenu.classList.toggle('translate-x-full'); }
+        mobileMenuBtn.addEventListener('click', toggleMenu);
+        closeMenuBtn.addEventListener('click', toggleMenu);
+
+        // Slider Logic
+        const slides = document.querySelectorAll('.slide');
+        const indicators = document.querySelectorAll('.indicator');
+        const progressBar = document.getElementById('progress-bar');
+        let currentSlide = 0;
+        let slideInterval;
+        const slideDuration = 18000; 
+
+        function resetProgressBar() {
+            progressBar.style.transition = 'none';
+            progressBar.style.width = '0%';
+            setTimeout(() => {
+                progressBar.style.transition = `width ${slideDuration}ms linear`;
+                progressBar.style.width = '100%';
+            }, 50);
+        }
+
+        function updateIndicators() {
+            indicators.forEach((ind, index) => {
+                if(index === currentSlide) {
+                    ind.classList.add('bg-gold-500'); ind.classList.remove('bg-gray-500/50');
+                } else {
+                    ind.classList.remove('bg-gold-500'); ind.classList.add('bg-gray-500/50');
+                }
+            });
+        }
+
+        function goToSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = n;
+            if (currentSlide >= slides.length) currentSlide = 0;
+            if (currentSlide < 0) currentSlide = slides.length - 1;
+            slides[currentSlide].classList.add('active');
+            updateIndicators();
+            resetProgressBar();
+            clearInterval(slideInterval);
+            slideInterval = setInterval(nextSlide, slideDuration);
+        }
+
+        function nextSlide() { goToSlide(currentSlide + 1); }
+
+        // Init Slider
+        updateIndicators();
+        resetProgressBar();
+        slideInterval = setInterval(nextSlide, slideDuration);
+    </script>
+</body>
+</html>
