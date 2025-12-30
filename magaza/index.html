@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marmaraspor Store | Resmi Alışveriş Sitesi</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Bebas+Neue&family=Anton&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            400: '#F4D03F', 
+                            500: '#D4AF37', 
+                            600: '#B7950B', 
+                            700: '#7D6608',
+                            800: '#584600',
+                        },
+                        onyx: {
+                            700: '#3f3f46', 
+                            800: '#27272a', 
+                            900: '#18181b', 
+                            950: '#09090b', 
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                        jersey: ['Anton', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(212, 175, 55, 0.5)',
+                        'glow-strong': '0 0 35px rgba(212, 175, 55, 0.7)',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: #52525b #18181b;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #18181b; }
+        ::-webkit-scrollbar-thumb { background: #52525b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
+
+        .nav-item { position: relative; overflow: hidden; }
+        .nav-item::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        .nav-item:hover::before { left: 100%; }
+        .nav-link-text { position: relative; z-index: 2; }
+
+        .text-gradient-gold {
+            background: linear-gradient(to bottom, #F4D03F 0%, #D4AF37 50%, #B7950B 100%);
+            background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            color: #D4AF37;
+        }
+
+        .product-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), 0 0 15px rgba(212, 175, 55, 0.1);
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+        .add-btn {
+            transform: translateY(100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .product-card:hover .add-btn {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .jersey-print-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            padding-top: 38%; 
+            pointer-events: none;
+            transform: perspective(500px) rotateX(5deg);
+            opacity: 1; mix-blend-mode: normal;
+        }
+
+        .jersey-name {
+            font-family: 'Anton', sans-serif; font-size: 2rem; line-height: 1; color: #ffc400;
+            text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1.5rem;
+            transform: scaleY(1.1); text-shadow: 1px 1px 2px rgba(0,0,0,0.8); text-align: center; width: 100%;
+        }
+
+        .jersey-number {
+            font-family: 'Anton', sans-serif; font-size: 6rem; line-height: 0.8; color: #000000;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,0,0,0.2); text-align: center; width: 100%;
+        }
+        
+        .size-radio:checked + label { background-color: #D4AF37; color: #09090b; border-color: #D4AF37; }
+        .tracking-bar-fill { transition: width 1s linear; }
+    </style>
+</head>
+<body class="bg-onyx-900 text-gray-300 font-sans selection:bg-gold-500 selection:text-onyx-900 overflow-x-hidden">
+
+    <!-- Navbar -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-500 border-b-2 border-gold-500 shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+        <div id="navbar-bg" class="absolute inset-0 bg-gradient-to-b from-black/90 to-transparent transition-all duration-500 -z-10"></div>
+
+        <div class="container mx-auto px-6">
+            <div class="flex justify-between items-center transition-all duration-500 py-6" id="navbar-container">
+                
+                <a href="../index.html" class="flex items-center gap-5 group relative">
+                    <div class="absolute inset-0 bg-gold-500/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                    <div class="relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                        <img id="nav-logo" src="https://i.hizliresim.com/pxf3135.png" alt="Marmaraspor Logo" class="w-20 h-20 object-contain drop-shadow-glow filter transition-all duration-500">
+                    </div>
+                    <div class="flex flex-col justify-center relative z-10">
+                        <h1 class="font-heading font-black text-4xl leading-[0.85] tracking-tight group-hover:scale-105 transition-transform origin-left">
+                            <span class="text-gradient-gold block drop-shadow-lg">MARMARA</span>
+                        </h1>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="h-[1px] w-4 bg-gold-500/80"></span>
+                            <span class="text-[0.65rem] font-bold tracking-[0.4em] text-gray-300 uppercase group-hover:text-white transition-colors">Spor Kulübü</span>
+                        </div>
+                    </div>
+                </a>
+
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="../index.html" class="nav-item px-6 py-3 rounded-lg text-sm font-bold uppercase tracking-widest text-gray-200 hover:text-white transition-all group hover:bg-white/5 border border-transparent hover:border-gold-500/30">
+                        <span class="nav-link-text group-hover:text-gold-400 transition-colors">Anasayfa</span>
+                    </a>
+
+                    <div class="relative group h-full">
+                        <button class="nav-item px-6 py-3 rounded-lg text-sm font-bold uppercase tracking-widest text-gray-200 hover:text-white transition-all flex items-center gap-2 group-hover:bg-white/5 border border-transparent hover:border-gold-500/30">
+                            <span class="nav-link-text">Kulüp</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-gold-500 transition-transform group-hover:rotate-180"></i>
+                        </button>
+                        <div class="absolute top-full right-0 w-56 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform -translate-y-2 group-hover:translate-y-0">
+                            <div class="bg-onyx-900/95 backdrop-blur-xl border border-gold-500/30 shadow-glow rounded-xl overflow-hidden">
+                                <a href="../Kulup/Kadro/index.html" class="block px-6 py-4 text-xs font-bold text-gray-400 hover:text-gold-500 hover:bg-white/5 tracking-[0.2em] uppercase transition-colors border-b border-gray-800 flex items-center justify-between group/item">
+                                    Kadro
+                                    <i data-lucide="users" class="w-4 h-4 opacity-0 group-hover/item:opacity-100 transition-opacity text-gold-500"></i>
+                                </a>
+                                <a href="../Kulup/Muze/index.html" class="block px-6 py-4 text-xs font-bold text-gray-400 hover:text-gold-500 hover:bg-white/5 tracking-[0.2em] uppercase transition-colors flex items-center justify-between group/item">
+                                    Müze
+                                    <i data-lucide="trophy" class="w-4 h-4 opacity-0 group-hover/item:opacity-100 transition-opacity text-gold-500"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="../haber/index.html" class="nav-item px-6 py-3 rounded-lg text-sm font-bold uppercase tracking-widest text-gray-200 hover:text-white transition-all group hover:bg-white/5 border border-transparent hover:border-gold-500/30">
+                        <span class="nav-link-text group-hover:text-gold-400 transition-colors">Haber</span>
+                    </a>
+                    
+                    <a href="index.html" class="ml-4 px-8 py-3 bg-gradient-to-r from-gold-600 to-gold-400 text-onyx-900 text-sm font-black uppercase tracking-widest rounded skew-x-[-10deg] hover:skew-x-0 hover:scale-105 transition-all shadow-[0_0_20px_rgba(212,175,55,0.4)] hover:shadow-[0_0_30px_rgba(212,175,55,0.6)]">
+                        <div class="skew-x-[10deg] group-hover:skew-x-0 flex items-center gap-2">
+                            Mağaza
+                            <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                        </div>
+                    </a>
+
+                    <!-- CART BUTTON -->
+                    <button id="cart-btn" onclick="openCart()" class="ml-4 relative group p-2 hover:bg-white/10 rounded-full transition-colors">
+                        <div class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-glow opacity-0 scale-0 transition-all duration-300" id="cart-count">0</div>
+                        <i data-lucide="shopping-cart" class="w-6 h-6 text-gold-500 group-hover:text-white transition-colors"></i>
+                    </button>
+
+                    <!-- AUTH BUTTONS -->
+                    <div id="auth-buttons" class="ml-4 flex items-center">
+                        <button onclick="openAuthModal()" id="btn-login" class="px-4 py-2 border border-gold-500 text-gold-500 text-xs font-bold uppercase tracking-widest rounded hover:bg-gold-500 hover:text-onyx-900 transition-colors">
+                            Giriş / Kayıt
+                        </button>
+                        <div id="user-menu" class="hidden relative group">
+                            <button class="flex items-center gap-2 text-gray-300 hover:text-white text-xs font-bold uppercase tracking-widest px-4 py-2">
+                                <i data-lucide="user" class="w-4 h-4 text-gold-500"></i>
+                                <span id="user-name-display">Hesabım</span>
+                            </button>
+                            <div class="absolute top-full right-0 w-48 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                                <div class="bg-onyx-900 border border-gray-700 rounded shadow-xl overflow-hidden">
+                                    <button onclick="openProfileModal()" class="w-full text-left px-4 py-3 text-xs font-bold text-gray-300 hover:bg-white/5 hover:text-gold-500 transition-colors border-b border-gray-800">
+                                        Siparişlerim
+                                    </button>
+                                    <button onclick="logout()" class="w-full text-left px-4 py-3 text-xs font-bold text-red-500 hover:bg-white/5 transition-colors">
+                                        Çıkış Yap
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="mobile-menu-btn" class="md:hidden text-gray-100 hover:text-gold-500 transition-colors p-2">
+                    <i data-lucide="menu" class="w-8 h-8 drop-shadow-md"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="fixed inset-0 bg-onyx-950/98 backdrop-blur-2xl z-40 transform translate-x-full transition-transform duration-500 flex flex-col items-center justify-center space-y-8 md:hidden">
+            <button id="close-menu-btn" class="absolute top-8 right-8 text-gray-400 hover:text-gold-500 transition-colors bg-white/5 p-2 rounded-full"><i data-lucide="x" class="w-8 h-8"></i></button>
+            <div class="text-center mb-8">
+                <img src="https://i.hizliresim.com/pxf3135.png" alt="Logo" class="w-20 h-20 mx-auto mb-4 drop-shadow-glow">
+                <h2 class="text-2xl font-heading font-black text-gradient-gold">MARMARA</h2>
+            </div>
+            <nav class="flex flex-col items-center gap-6 w-full px-8">
+                <a href="../index.html" class="w-full text-center py-4 border-b border-gray-800 text-xl font-heading font-bold text-white hover:text-gold-500 transition-colors tracking-widest">ANASAYFA</a>
+                <a href="../Kulup/Kadro/index.html" class="w-full text-center py-4 border-b border-gray-800 text-xl font-heading font-bold text-white hover:text-gold-500 transition-colors tracking-widest">KADRO</a>
+                <a href="../magaza/index.html" class="w-full text-center py-4 bg-gold-500 text-onyx-900 font-black text-xl rounded mt-4 hover:bg-gold-400 transition-colors shadow-glow">MAĞAZA</a>
+                <button onclick="openAuthModal()" id="mobile-auth-btn" class="w-full text-center py-4 border-b border-gray-800 text-xl font-heading font-bold text-white hover:text-gold-500 transition-colors tracking-widest">GİRİŞ YAP</button>
+            </nav>
+        </div>
+    </nav>
+
+    <!-- BANNER -->
+    <section class="relative h-[80vh] w-full bg-onyx-900 overflow-hidden flex items-center">
+        <div class="absolute inset-0 bg-[url('https://i.hizliresim.com/pxf3135.png')] bg-cover bg-center">
+            <div class="absolute inset-0 bg-gradient-to-r from-onyx-950 via-onyx-900/90 to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-onyx-900 via-transparent to-transparent"></div>
+        </div>
+        <div class="container mx-auto px-6 relative z-10 grid md:grid-cols-2 gap-12 items-center mt-20">
+            <div class="text-left space-y-6">
+                <h1 class="font-heading text-6xl md:text-8xl font-black text-gray-100 leading-none">
+                    MARMARA <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-gold-700 drop-shadow-glow">STORE</span>
+                </h1>
+                <p class="text-xl text-gray-400 font-light max-w-lg">
+                    2025/2026 Sezon formaları suan satışta!
+                </p>
+                <div class="flex gap-4 pt-4">
+                    <a href="#koleksiyon" class="px-8 py-4 bg-gold-500 text-onyx-900 font-bold uppercase tracking-widest rounded hover:bg-white transition-all shadow-glow hover:scale-105">İncele</a>
+                    <a href="#koleksiyon" class="px-8 py-4 border border-gray-600 text-gray-300 font-bold uppercase tracking-widest rounded hover:border-gold-500 hover:text-gold-500 transition-all bg-onyx-900/50 backdrop-blur">Tüm Ürünler</a>
+                </div>
+            </div>
+            <div class="relative hidden md:block">
+                <div class="absolute inset-0 bg-gold-500/20 blur-[100px] rounded-full animate-pulse-slow"></div>
+                <img src="https://drive.google.com/thumbnail?id=17nejtKVV_-ZwW0tnYt9HsrZlBL8lHQRb&sz=s800" class="relative z-10 w-full max-w-lg mx-auto transform rotate-[-5deg] hover:rotate-0 transition-transform duration-700 drop-shadow-2xl animate-float" alt="Yeni Sezon Forma">
+            </div>
+        </div>
+    </section>
+
+    <!-- CATEGORY BAR -->
+    <div class="sticky top-[88px] z-30 bg-onyx-900/80 backdrop-blur-md border-y border-gray-800 shadow-xl">
+        <div class="container mx-auto px-6 overflow-x-auto">
+            <div class="flex items-center gap-8 py-4 min-w-max" id="category-filters">
+                <button onclick="filterProducts('all', this)" class="category-btn active text-gold-500 font-bold text-sm uppercase tracking-widest border-b-2 border-gold-500 pb-1 transition-all">Tümü</button>
+                <button onclick="filterProducts('formalar', this)" class="category-btn text-gray-400 hover:text-white font-bold text-sm uppercase tracking-widest border-b-2 border-transparent hover:border-gold-500/50 pb-1 transition-all">Formalar</button>
+                <button onclick="filterProducts('antrenman', this)" class="category-btn text-gray-400 hover:text-white font-bold text-sm uppercase tracking-widest border-b-2 border-transparent hover:border-gold-500/50 pb-1 transition-all">Antrenman</button>
+                <button onclick="filterProducts('giyim', this)" class="category-btn text-gray-400 hover:text-white font-bold text-sm uppercase tracking-widest border-b-2 border-transparent hover:border-gold-500/50 pb-1 transition-all">Giyim</button>
+                <button onclick="filterProducts('aksesuar', this)" class="category-btn text-gray-400 hover:text-white font-bold text-sm uppercase tracking-widest border-b-2 border-transparent hover:border-gold-500/50 pb-1 transition-all">Aksesuar</button>
+                <button onclick="filterProducts('indirim', this)" class="category-btn text-red-500 hover:text-red-400 font-bold text-sm uppercase tracking-widest border-b-2 border-transparent hover:border-red-500/50 pb-1 transition-all flex items-center gap-1"><i data-lucide="percent" class="w-3 h-3"></i> İndirim</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRODUCTS SECTION (Dynamic) -->
+    <section id="koleksiyon" class="py-20 bg-gradient-to-b from-onyx-900 to-black">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-between items-end mb-12">
+                <div>
+                    <span class="text-gold-500 text-xs font-bold tracking-[0.3em] uppercase block mb-2">Resmi Ürünler</span>
+                    <h2 class="text-3xl md:text-5xl font-heading font-bold text-white uppercase">Sezon <span class="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-gold-700">Favorileri</span></h2>
+                </div>
+            </div>
+            
+            <!-- Products Grid - JS Will Fill This -->
+            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Ürünler otomatik buraya gelecek -->
+            </div>
+
+        </div>
+    </section>
+
+    <!-- AUTH MODAL -->
+    <div id="auth-modal" class="fixed inset-0 z-[80] hidden">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm transition-opacity" onclick="closeAuthModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-onyx-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-md p-8 relative">
+                <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-heading font-bold text-white mb-2">MARMARASPOR</h2>
+                    <p class="text-sm text-gray-400">Taraftar ailesine katıl.</p>
+                </div>
+                
+                <!-- Login Form -->
+                <div id="login-form">
+                    <div class="space-y-4">
+                        <input type="text" id="login-name" class="w-full bg-onyx-800 border border-gray-700 rounded p-3 text-white focus:border-gold-500 outline-none" placeholder="Adınız">
+                        <button onclick="handleLogin()" class="w-full bg-gold-500 text-onyx-900 py-3 rounded font-bold uppercase tracking-widest hover:bg-white transition-colors">Giriş Yap</button>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <span class="text-gray-500 text-sm">Hesabın yok mu?</span>
+                        <button onclick="toggleAuthMode('register')" class="text-gold-500 text-sm font-bold ml-1 hover:underline">Kayıt Ol</button>
+                    </div>
+                </div>
+
+                <!-- Register Form -->
+                <div id="register-form" class="hidden">
+                    <div class="space-y-4">
+                        <input type="text" id="reg-name" class="w-full bg-onyx-800 border border-gray-700 rounded p-3 text-white focus:border-gold-500 outline-none" placeholder="Ad Soyad">
+                        <input type="email" id="reg-email" class="w-full bg-onyx-800 border border-gray-700 rounded p-3 text-white focus:border-gold-500 outline-none" placeholder="E-posta Adresi">
+                        <button onclick="handleRegister()" class="w-full bg-gold-500 text-onyx-900 py-3 rounded font-bold uppercase tracking-widest hover:bg-white transition-colors">Kayıt Ol</button>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <span class="text-gray-500 text-sm">Zaten üye misin?</span>
+                        <button onclick="toggleAuthMode('login')" class="text-gold-500 text-sm font-bold ml-1 hover:underline">Giriş Yap</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFILE/ORDERS MODAL -->
+    <div id="profile-modal" class="fixed inset-0 z-[75] hidden">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm transition-opacity" onclick="closeProfileModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-onyx-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-2xl h-[70vh] flex flex-col relative overflow-hidden">
+                <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-onyx-950/50">
+                    <h2 class="text-xl font-heading font-bold text-white flex items-center gap-2"><i data-lucide="package" class="w-5 h-5 text-gold-500"></i> Sipariş Geçmişim</h2>
+                    <button onclick="closeProfileModal()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-6" id="order-history-container">
+                    <div class="text-center text-gray-500 mt-10">Yükleniyor...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="fixed bottom-10 right-10 bg-onyx-800 border-l-4 border-gold-500 text-white px-6 py-4 rounded shadow-2xl transform translate-y-20 opacity-0 transition-all duration-500 z-50 flex items-center gap-4">
+        <div class="bg-gold-500/20 p-2 rounded-full"><i data-lucide="check" class="w-5 h-5 text-gold-500"></i></div>
+        <div><h4 id="toast-title" class="font-bold text-sm">Bildirim</h4><p id="toast-desc" class="text-xs text-gray-400">İşlem başarılı.</p></div>
+    </div>
+
+    <!-- PRODUCT DETAIL MODAL -->
+    <div id="product-detail-modal" class="fixed inset-0 z-[70] hidden">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm transition-opacity" onclick="closeProductModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-onyx-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-5xl h-[80vh] flex overflow-hidden relative animate-fade-in flex-col md:flex-row">
+                <button onclick="closeProductModal()" class="absolute top-4 right-4 z-50 bg-black/50 p-2 rounded-full text-white hover:text-gold-500 transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
+                <!-- Left: Image -->
+                <div class="w-full md:w-1/2 bg-gradient-to-b from-gray-800 to-black relative flex items-center justify-center p-8 overflow-hidden">
+                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
+                    <div id="modal-image-container" class="relative w-full max-w-sm aspect-[3/4]">
+                        <img id="modal-product-img" src="" class="w-full h-full object-contain drop-shadow-2xl transition-all duration-500">
+                        <div id="modal-jersey-overlays" class="jersey-print-container opacity-0 transition-opacity duration-300">
+                            <div id="modal-overlay-name" class="jersey-name"></div>
+                            <div id="modal-overlay-number" class="jersey-number"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Right: Details -->
+                <div class="w-full md:w-1/2 p-8 md:p-12 overflow-y-auto bg-onyx-900">
+                    <span id="modal-category" class="text-gold-500 text-xs font-bold tracking-[0.3em] uppercase block mb-2">Kategori</span>
+                    <h2 id="modal-title" class="text-3xl font-heading font-black text-white uppercase leading-tight mb-2">Ürün Adı</h2>
+                    <p id="modal-price" class="text-2xl font-bold text-gold-500 mb-6">₺0,00</p>
+                    <div class="h-px bg-gray-800 w-full mb-8"></div>
+                    <!-- Size -->
+                    <div class="mb-8" id="modal-size-section">
+                        <label class="text-xs text-gray-400 uppercase font-bold mb-3 block tracking-widest">Beden Seçin</label>
+                        <div class="flex flex-wrap gap-3">
+                            <div class="relative"><input type="radio" name="size" id="size-xs" value="XS" class="peer sr-only size-radio"><label for="size-xs" class="w-12 h-12 flex items-center justify-center border border-gray-600 rounded cursor-pointer text-gray-400 font-bold hover:border-gold-500 transition-all">XS</label></div>
+                            <div class="relative"><input type="radio" name="size" id="size-s" value="S" class="peer sr-only size-radio"><label for="size-s" class="w-12 h-12 flex items-center justify-center border border-gray-600 rounded cursor-pointer text-gray-400 font-bold hover:border-gold-500 transition-all">S</label></div>
+                            <div class="relative"><input type="radio" name="size" id="size-m" value="M" class="peer sr-only size-radio"><label for="size-m" class="w-12 h-12 flex items-center justify-center border border-gray-600 rounded cursor-pointer text-gray-400 font-bold hover:border-gold-500 transition-all">M</label></div>
+                            <div class="relative"><input type="radio" name="size" id="size-l" value="L" class="peer sr-only size-radio"><label for="size-l" class="w-12 h-12 flex items-center justify-center border border-gray-600 rounded cursor-pointer text-gray-400 font-bold hover:border-gold-500 transition-all">L</label></div>
+                            <div class="relative"><input type="radio" name="size" id="size-xl" value="XL" class="peer sr-only size-radio"><label for="size-xl" class="w-12 h-12 flex items-center justify-center border border-gray-600 rounded cursor-pointer text-gray-400 font-bold hover:border-gold-500 transition-all">XL</label></div>
+                             <div class="relative"><input type="radio" name="size" id="size-xxl" value="XXL" class="peer sr-only size-radio"><label for="size-xxl" class="w-12 h-12 flex items-center justify-center border border-gray-600 rounded cursor-pointer text-gray-400 font-bold hover:border-gold-500 transition-all">2XL</label></div>
+                        </div>
+                    </div>
+                    <!-- Personalization -->
+                    <div id="modal-personalization-section" class="mb-8 hidden p-6 bg-onyx-800/50 rounded-xl border border-gray-800">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2"><i data-lucide="shirt" class="w-4 h-4 text-gold-500"></i> Kişiselleştirme</h4>
+                            <span class="text-xs text-gold-500 font-bold">+250 TL</span>
+                        </div>
+                        <div class="flex items-center gap-2 mb-4">
+                             <input type="checkbox" id="enable-personalization" class="w-4 h-4 accent-gold-500" onchange="togglePersonalizationInputs()">
+                             <label for="enable-personalization" class="text-sm text-gray-300 cursor-pointer">Formama isim ve numara ekle</label>
+                        </div>
+                        <div id="personalization-inputs" class="space-y-4 hidden opacity-0 transition-all duration-300">
+                            <div><label class="text-[10px] text-gray-500 uppercase font-bold mb-1 block">İsim</label><input type="text" id="modal-jersey-name" maxlength="10" class="w-full bg-onyx-900 border border-gray-700 rounded p-3 text-white focus:border-gold-500 focus:outline-none uppercase" placeholder="İSMİNİZ"></div>
+                            <div><label class="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Numara</label><input type="text" id="modal-jersey-number" maxlength="2" class="w-20 bg-onyx-900 border border-gray-700 rounded p-3 text-white focus:border-gold-500 focus:outline-none text-center" placeholder="10"></div>
+                        </div>
+                    </div>
+                    <div class="mt-auto">
+                        <button onclick="addToCartFromModal()" class="w-full bg-gold-500 text-onyx-900 py-4 rounded font-bold uppercase tracking-widest hover:bg-white transition-colors shadow-glow flex items-center justify-center gap-2"><i data-lucide="shopping-bag" class="w-5 h-5"></i> Sepete Ekle</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CART MODAL -->
+    <div id="cart-modal" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onclick="closeCart()"></div>
+        <div class="absolute right-0 top-0 h-full w-full md:w-[450px] bg-onyx-900 border-l border-gold-500/20 shadow-2xl transform transition-transform duration-500 translate-x-full flex flex-col" id="cart-panel">
+            <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-onyx-950/50">
+                <h2 class="text-xl font-heading font-bold text-white uppercase tracking-widest flex items-center gap-2"><i data-lucide="shopping-bag" class="w-5 h-5 text-gold-500"></i> Sepetim</h2>
+                <button onclick="closeCart()" class="text-gray-400 hover:text-white transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <!-- View 1: Cart Items -->
+            <div id="view-cart" class="flex-1 flex flex-col h-full">
+                <div class="flex-1 overflow-y-auto p-6 space-y-4" id="cart-items-container"></div>
+                <div class="p-6 border-t border-gray-800 bg-onyx-950/30">
+                    <div class="flex justify-between items-center mb-4 text-gray-400 text-sm"><span>Ara Toplam</span><span id="cart-subtotal">₺0,00</span></div>
+                    <div class="flex justify-between items-center mb-6 text-white text-xl font-bold"><span>Toplam</span><span id="cart-total" class="text-gold-500">₺0,00</span></div>
+                    <button onclick="goToCheckout()" class="w-full bg-gold-500 text-onyx-900 py-4 rounded font-bold uppercase tracking-widest hover:bg-white transition-colors shadow-glow">Siparişi Tamamla</button>
+                </div>
+            </div>
+            <!-- View 2: Payment -->
+            <div id="view-checkout" class="hidden flex-1 flex flex-col h-full">
+                <div class="flex-1 overflow-y-auto p-6">
+                    <div class="mb-6">
+                        <button onclick="backToCart()" class="text-sm text-gray-400 hover:text-gold-500 flex items-center gap-1 mb-4"><i data-lucide="arrow-left" class="w-4 h-4"></i> Sepete Dön</button>
+                        <h3 class="text-lg font-bold text-white mb-1">Ödeme Bilgileri</h3>
+                        <p class="text-xs text-gray-500">Güvenli ödeme altyapısı</p>
+                    </div>
+                    <form onsubmit="event.preventDefault(); processPayment();" class="space-y-4">
+                        <div class="space-y-2"><label class="text-xs text-gray-400 uppercase font-bold">Kart Üzerindeki İsim</label><input type="text" class="w-full bg-onyx-800 border border-gray-700 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition-colors" placeholder="Ad Soyad"></div>
+                        <div class="space-y-2">
+                            <label class="text-xs text-gray-400 uppercase font-bold">Kart Numarası</label>
+                            <div class="relative"><input type="text" class="w-full bg-onyx-800 border border-gray-700 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition-colors pl-10" placeholder="0000 0000 0000 0000"><i data-lucide="credit-card" class="absolute left-3 top-3.5 w-4 h-4 text-gray-500"></i></div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="space-y-2 flex-1"><label class="text-xs text-gray-400 uppercase font-bold">Son Kullanma</label><input type="text" class="w-full bg-onyx-800 border border-gray-700 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition-colors" placeholder="AA/YY"></div>
+                            <div class="space-y-2 flex-1"><label class="text-xs text-gray-400 uppercase font-bold">CVV</label><input type="text" class="w-full bg-onyx-800 border border-gray-700 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition-colors" placeholder="123"></div>
+                        </div>
+                        <div class="mt-8 pt-6 border-t border-gray-800">
+                             <button type="submit" class="w-full bg-gradient-to-r from-gold-600 to-gold-400 text-onyx-900 py-4 rounded font-bold uppercase tracking-widest hover:scale-[1.02] transition-transform shadow-glow flex justify-center items-center gap-2">
+                                <span id="pay-btn-text">Ödemeyi Onayla</span>
+                                <div id="pay-spinner" class="hidden w-5 h-5 border-2 border-onyx-900 border-t-transparent rounded-full animate-spin"></div>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- View 3: Success -->
+            <div id="view-success" class="hidden flex-1 flex flex-col h-full items-center p-8 text-center overflow-y-auto">
+                <div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-4 mt-4"><i data-lucide="check-circle" class="w-8 h-8 text-green-500"></i></div>
+                <h3 class="text-2xl font-heading font-bold text-white mb-2">Sipariş Alındı!</h3>
+                <p class="text-gray-400 text-sm mb-8">Sipariş No: <span class="text-gold-500 font-mono">#MRM2025</span></p>
+                <div class="w-full bg-onyx-800 p-6 rounded-xl border border-gray-700 text-left mb-8">
+                    <h4 class="text-sm font-bold text-white uppercase mb-4 flex items-center gap-2"><i data-lucide="truck" class="w-4 h-4 text-gold-500"></i> Kargo Durumu</h4>
+                    <div class="relative h-2 bg-gray-700 rounded-full mb-2"><div id="tracking-bar" class="absolute top-0 left-0 h-full bg-gold-500 rounded-full w-0 tracking-bar-fill shadow-[0_0_10px_rgba(212,175,55,0.8)]"></div></div>
+                    <div class="flex justify-between text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-2"><span>Sipariş</span><span>Teslimat</span></div>
+                    <div class="mt-4 p-3 bg-black/30 rounded border border-white/5"><p id="tracking-status" class="text-sm text-white font-bold animate-pulse">Sipariş işleniyor...</p></div>
+                </div>
+                <button onclick="closeCart(); resetCartUI();" class="px-8 py-3 border border-gold-500 text-gold-500 rounded font-bold uppercase tracking-widest hover:bg-gold-500 hover:text-onyx-900 transition-colors">Alışverişe Devam Et</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOCAL STORAGE AUTH & LOGIC SCRIPT (REPLACING FIREBASE) -->
+    <script>
+        // --- SIMULATED BACKEND WITH LOCALSTORAGE ---
+        
+        let currentUser = null;
+
+        // AUTH FUNCTIONS
+        function initAuth() {
+            const storedUser = localStorage.getItem('marmara_user');
+            if (storedUser) {
+                currentUser = JSON.parse(storedUser);
+                updateAuthUI();
+                console.log("Kullanıcı otomatik giriş yaptı:", currentUser.name);
+            }
+        }
+
+        window.handleRegister = function() {
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+
+            if(!name || !email) return alert("Lütfen tüm alanları doldurun.");
+
+            // Create fake user object
+            const newUser = {
+                uid: 'user_' + Math.floor(Math.random() * 1000000),
+                name: name,
+                email: email,
+                joinedAt: new Date().toISOString()
+            };
+
+            // Save to LocalStorage
+            localStorage.setItem('marmara_user', JSON.stringify(newUser));
+            currentUser = newUser;
+            
+            updateAuthUI();
+            closeAuthModal();
+            showToastMsg("Başarıyla Kayıt Olundu", "Aramıza hoşgeldin " + name);
+        }
+
+        window.handleLogin = function() {
+            const name = document.getElementById('login-name').value;
+            if(!name) return alert("Lütfen isminizi girin.");
+
+            // Simulating login - In a real app we check password. 
+            // Here we just create a session for the name provided or retrieve existing if logic matched.
+            
+            // Simple logic: Just log them in with this name for the demo
+            const user = {
+                uid: 'user_' + Math.floor(Math.random() * 1000000),
+                name: name,
+                email: 'demo@marmaraspor.com',
+                joinedAt: new Date().toISOString()
+            };
+
+            localStorage.setItem('marmara_user', JSON.stringify(user));
+            currentUser = user;
+
+            updateAuthUI();
+            closeAuthModal();
+            showToastMsg("Giriş Başarılı", "Tekrar hoşgeldin " + name);
+        }
+
+        window.logout = function() {
+            localStorage.removeItem('marmara_user');
+            currentUser = null;
+            updateAuthUI();
+            showToastMsg("Çıkış Yapıldı", "Görüşmek üzere!");
+        }
+
+        function updateAuthUI() {
+            const btnLogin = document.getElementById('btn-login');
+            const userMenu = document.getElementById('user-menu');
+            const mobileAuthBtn = document.getElementById('mobile-auth-btn');
+            const userNameDisplay = document.getElementById('user-name-display');
+
+            if (currentUser) {
+                btnLogin.classList.add('hidden');
+                userMenu.classList.remove('hidden');
+                userNameDisplay.innerText = currentUser.name;
+                
+                mobileAuthBtn.innerText = "HESABIM / ÇIKIŞ";
+                mobileAuthBtn.onclick = openProfileModal;
+            } else {
+                btnLogin.classList.remove('hidden');
+                userMenu.classList.add('hidden');
+                
+                mobileAuthBtn.innerText = "GİRİŞ YAP";
+                mobileAuthBtn.onclick = openAuthModal;
+            }
+        }
+
+        // ORDER FUNCTIONS
+        window.placeOrderLocal = function(orderTotal, cartItems) {
+            if(!currentUser) return;
+
+            const newOrder = {
+                id: '#MRM' + Math.floor(Math.random() * 10000),
+                items: cartItems,
+                total: orderTotal,
+                date: new Date().toISOString(),
+                status: 'pending'
+            };
+
+            // Get existing orders
+            let orders = JSON.parse(localStorage.getItem('marmara_orders_' + currentUser.uid) || "[]");
+            orders.push(newOrder);
+            
+            // Save back
+            localStorage.setItem('marmara_orders_' + currentUser.uid, JSON.stringify(orders));
+            console.log("Sipariş kaydedildi (Local):", newOrder);
+        }
+
+        window.fetchOrderHistoryLocal = function() {
+            if(!currentUser) return;
+            const container = document.getElementById('order-history-container');
+            container.innerHTML = '<div class="text-center text-gray-500 mt-10">Yükleniyor...</div>';
+
+            const orders = JSON.parse(localStorage.getItem('marmara_orders_' + currentUser.uid) || "[]");
+
+            // Sort by date desc
+            orders.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            let html = '';
+            if(orders.length === 0) {
+                html = '<div class="text-center text-gray-500 mt-10">Henüz siparişiniz bulunmuyor.</div>';
+            } else {
+                orders.forEach(order => {
+                    let itemsHtml = order.items.map(i => `${i.name} (${i.size})`).join(', ');
+                    const statusObj = calculateOrderStatus(new Date(order.date));
+
+                    html += `
+                        <div class="bg-onyx-800 p-4 rounded-lg border border-gray-700 mb-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-gold-500 font-bold">${order.id}</span>
+                                <span class="text-xs text-gray-400">Tutar: ₺${order.total.toLocaleString('tr-TR')}</span>
+                            </div>
+                            <p class="text-sm text-gray-300 mb-4">${itemsHtml}</p>
+                            
+                            <!-- Mini Tracking Bar in History -->
+                            <div class="relative h-1.5 bg-gray-700 rounded-full mb-2">
+                                <div class="absolute top-0 left-0 h-full bg-gold-500 rounded-full shadow-[0_0_5px_rgba(212,175,55,0.8)]" style="width: ${statusObj.width}"></div>
+                            </div>
+                            
+                            <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider justify-end">
+                                <span class="w-2 h-2 rounded-full ${statusObj.status === 'Teslim Edildi' ? 'bg-green-500' : 'bg-gold-500'} animate-pulse"></span>
+                                <span class="${statusObj.color}">${statusObj.status}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            container.innerHTML = html;
+        }
+
+        function calculateOrderStatus(orderDate) {
+            const now = new Date();
+            const diffInSeconds = (now - orderDate) / 1000;
+
+            if (diffInSeconds < 10) {
+                return { status: 'Hazırlanıyor', color: 'text-gray-400', width: '10%' };
+            } else if (diffInSeconds < 30) {
+                return { status: 'Paketleniyor', color: 'text-gold-500', width: '30%' };
+            } else if (diffInSeconds < 60) {
+                return { status: 'Kargoya Verildi', color: 'text-blue-400', width: '60%' };
+            } else if (diffInSeconds < 90) {
+                return { status: 'Dağıtımda', color: 'text-purple-400', width: '85%' };
+            } else {
+                return { status: 'Teslim Edildi', color: 'text-green-500', width: '100%' };
+            }
+        }
+
+        window.checkAuthForCheckout = function() {
+            if(!currentUser) {
+                alert("Sipariş verebilmek için lütfen önce giriş yapın veya kayıt olun.");
+                openAuthModal();
+                return false;
+            }
+            return true;
+        }
+
+        // Initialize Auth on Load
+        document.addEventListener('DOMContentLoaded', initAuth);
+
+    </script>
+
+    <!-- Main Logic Script -->
+    <script>
+        lucide.createIcons();
+        
+        // ==========================================
+        // ÜRÜNLERİ BURADAN DÜZENLEYİN (Yeni Sistem)
+        // ==========================================
+        const URUN_KATALOGU = [
+            {
+                id: 1,
+                name: "2025 İç Saha Forması",
+                price: 1899,
+                indirimliFiyat: 500,
+                category: "formalar",
+                imgFront: "https://drive.google.com/thumbnail?id=1Q_OCK6hxjr3Qd-BsZ12ulAyvC3A5HvVK&sz=s800",
+                imgBack: "https://drive.google.com/thumbnail?id=13-Wy6NSxKwFZIR-e5cCP0C7nr77_Q2We&sz=s800",
+                altBaslik: "",
+                etiket: "" // Sol üstteki sarı etiket (Boş bırakırsanız çıkmaz)
+            },
+            {
+                id: 2,
+                name: "2025 Deplasman Forması",
+                price: 1899,
+                indirimliFiyat: 500,
+                category: "formalar",
+                imgFront: "https://drive.google.com/thumbnail?id=1Y9Fm7KtsWms5UN4HR39OEYe9mPoqNnKw&sz=s800",
+                imgBack: "https://drive.google.com/thumbnail?id=1uRO6HSxn-CQTzd2n3LuitHzaPFeQ8C3G&sz=s800",
+                altBaslik: "",
+                etiket: ""
+            },
+            {
+                id: 3,
+                name: "Marmaraspor Adidas sponsorlu spor çantası",
+                price: 1250,
+                category: "aksesuar",
+                imgFront: "https://drive.google.com/thumbnail?id=1MBh3aQ1P1pXLB0bPMBIajBiOLxL0S5C3&sz=s800",
+                imgBack: "",
+                altBaslik: "",
+                etiket: "YENİ"
+            },
+            {
+                id: 4,
+                name: "Marmaraspor Taraftar Atkısı",
+                price: 350,
+                indirimliFiyat: 280, // Eğer indirim varsa buraya indirimli fiyatı yazın
+                category: "aksesuar",
+                imgFront: "https://drive.google.com/thumbnail?id=1CFQN6UYmUEyVJZgE-9hjRLbAI_eFvtLF&sz=s800",
+                imgBack: "",
+                altBaslik: "",
+                etiket: ""
+            },
+            {
+                id: 5,
+                name: "Marmaraspor Bere",
+                price: 350,
+                indirimliFiyat: 80, // Eğer indirim varsa buraya indirimli fiyatı yazın
+                category: "aksesuar",
+                imgFront: "https://drive.google.com/thumbnail?id=1v9pZaMAv4srIeD69DbGmUUdsFl9iPGUq&sz=s800",
+                imgBack: "",
+                altBaslik: "",
+                etiket: ""
+            },
+             {
+                id: 6,
+                name: "Marmaraspor Sapka",
+                price: 350,
+                category: "aksesuar",
+                imgFront: "https://drive.google.com/thumbnail?id=15H_PVzKoXhghCI7bP7G34NX94oKsAFWO&sz=s800",
+                imgBack: "",
+                altBaslik: "",
+                etiket: ""
+            },
+             {
+                id: 7,
+                name: "Marmaraspor Termos",
+                price: 1000,
+                category: "aksesuar",
+                imgFront: "https://drive.google.com/thumbnail?id=115NGgMCmeqd0e74K_AbfqHzfw5_hPleY&sz=s800",
+                imgBack: "",
+                altBaslik: "",
+                etiket: ""
+            },
+            {
+                id: 8,
+                name: "Marmaraspor Cüzdan",
+                price: 800,
+                category: "aksesuar",
+                imgFront: "https://drive.google.com/thumbnail?id=1XjO4mPqAVS2U2ga0hBorLzL5oaALgnde&sz=s800",
+                imgBack: "",
+                altBaslik: "",
+                etiket: ""
+            },
+             {
+                id: 9,
+                name: "Marmaraspor Rozet",
+                price: 800,
+                category: "aksesuar",
+                imgFront: "https://drive.google.com/thumbnail?id=1bf5bXRsc-S05VH8NpoBbQ1T4J4s1D_wp&sz=s800",
+                imgBack: "",
+                altBaslik: "",
+                etiket: ""
+            },
+             {
+                id: 10,
+                name: "Marmaraspor Telefon Kılıfı",
+                price: 1000,
+                category: "aksesuar",
+                imgFront: "https://drive.google.com/thumbnail?id=11ftWoTF0uk4RLQIk9qfxB9VM2DO9QbMG&sz=s800",
+                imgBack: "",
+                altBaslik: "",
+                etiket: ""
+            },
+              {
+                id: 11,
+                name: "Marmaraspor Uyku seti",
+                price: 7000,
+                category: "aksesuar",
+                imgFront: "https://drive.google.com/thumbnail?id=1MMUjHHmINSiWXyHThiUIwdLqqrNb2oZX&sz=s800",
+                imgBack: "",
+                altBaslik: "",
+                etiket: "YENİ"
+            },
+             {
+                id: 12,
+                name: "Marmaraspor Havlu",
+                price: 100,
+                category: "aksesuar",
+                imgFront: "https://drive.google.com/thumbnail?id=1tAHVNUo52q8XF_HvZ1zxNi8N6gqQ3dWk&sz=s800",
+                imgBack: "",
+                altBaslik: "",
+                etiket: ""
+            },
+              {
+                id: 13,
+                name: "Marmaraspor T-Shirt",
+                price: 1500,
+                category: "giyim",
+                imgFront: "https://drive.google.com/thumbnail?id=1GzrZabgen7hhvnJtT0c6gSjm_VJLGRuV&sz=s800",
+                imgBack: "",
+                altBaslik: "",
+                etiket: ""
+            },
+            {
+                id: 14,
+                name: "Marmaraspor Sweatshirt",
+                price: 1500,
+                category: "giyim",
+                imgFront: "https://drive.google.com/thumbnail?id=1AwEghdZnKuuiiQsSFc4y_tjBgwvEAQdk&sz=s800",
+                imgBack: "",
+                altBaslik: "",
+                etiket: ""
+            },
+             {
+                id: 15,
+                name: "Marmaraspor Antrenman Alt&Üst",
+                price: 1500,
+                category: "antrenman",
+                imgFront: "https://drive.google.com/thumbnail?id=1Cqg6Xl0n9D4hN9whnHH7KF3TsZpRCJ__&sz=s800",
+                imgBack: "",
+                altBaslik: "",
+                etiket: "YENİ"
+            },
+        ];
+
+        // --- GLOBAL VARIABLES ---
+        let currentProduct = null;
+        let selectedSize = null;
+        let isPersonalized = false;
+        let cart = [];
+
+        // --- RENDER PRODUCTS AUTOMATICALLY ---
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = ""; // Temizle
+
+            URUN_KATALOGU.forEach(urun => {
+                const isDiscount = urun.indirimliFiyat && urun.indirimliFiyat < urun.price;
+                const finalPrice = isDiscount ? urun.indirimliFiyat : urun.price;
+                const priceHtml = isDiscount 
+                    ? `<div class="flex flex-col"><span class="text-sm text-gray-400 line-through">₺${urun.price.toLocaleString('tr-TR')}</span><span class="text-xl font-bold text-red-500">₺${urun.indirimliFiyat.toLocaleString('tr-TR')}</span></div>`
+                    : `<span class="text-xl font-bold text-gold-500">₺${urun.price.toLocaleString('tr-TR')}</span>`;
+                
+                let badgeHtml = "";
+                if (urun.etiket) {
+                    badgeHtml = `<div class="absolute top-4 left-4 z-20 bg-gold-500 text-onyx-900 text-xs font-black px-2 py-1 rounded uppercase tracking-wider">${urun.etiket}</div>`;
+                } else if (isDiscount) {
+                    const discountPercent = Math.round(((urun.price - urun.indirimliFiyat) / urun.price) * 100);
+                    badgeHtml = `<div class="absolute top-4 left-4 z-20 bg-red-600 text-white text-xs font-black px-2 py-1 rounded uppercase tracking-wider">%${discountPercent} İndirim</div>`;
+                }
+
+                const card = document.createElement('div');
+                card.className = "group product-card relative bg-onyx-800 rounded-xl overflow-hidden border border-gray-800 hover:border-gold-500/50 animate-fade-in";
+                card.dataset.category = urun.category; // Filtreleme için önemli
+                if(isDiscount) card.dataset.discount = "true";
+
+                // HTML Structure
+                card.innerHTML = `
+                    ${badgeHtml}
+                    <div onclick="openProductById(${urun.id})" class="h-[350px] bg-gradient-to-b from-gray-800 to-onyx-800 p-6 flex items-center justify-center overflow-hidden relative cursor-pointer">
+                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+                        <img src="${urun.imgFront}" alt="${urun.name}" class="w-full h-auto max-h-full object-contain transform group-hover:scale-110 transition-transform duration-500 drop-shadow-xl">
+                    </div>
+                    <div class="p-6">
+                        <h3 onclick="openProductById(${urun.id})" class="font-heading font-bold text-lg text-white mb-1 group-hover:text-gold-400 transition-colors cursor-pointer">${urun.name}</h3>
+                        <p class="text-xs text-gray-500 mb-3">${urun.altBaslik || ""}</p>
+                        <div class="flex items-center justify-between">
+                            ${priceHtml}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Sayfa yüklendiğinde çalıştır
+        document.addEventListener('DOMContentLoaded', renderProducts);
+
+        // --- AUTH & MODAL HELPERS ---
+        function openAuthModal() {
+            document.getElementById('auth-modal').classList.remove('hidden');
+        }
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+        function toggleAuthMode(mode) {
+            if(mode === 'register') {
+                document.getElementById('login-form').classList.add('hidden');
+                document.getElementById('register-form').classList.remove('hidden');
+            } else {
+                document.getElementById('login-form').classList.remove('hidden');
+                document.getElementById('register-form').classList.add('hidden');
+            }
+        }
+        function openProfileModal() {
+            document.getElementById('profile-modal').classList.remove('hidden');
+            if(window.fetchOrderHistoryLocal) window.fetchOrderHistoryLocal();
+        }
+        function closeProfileModal() {
+            document.getElementById('profile-modal').classList.add('hidden');
+        }
+        function showToastMsg(title, desc) {
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-desc').innerText = desc;
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // --- PRODUCT MODAL ---
+        const productModal = document.getElementById('product-detail-modal');
+        const sizeRadios = document.querySelectorAll('input[name="size"]');
+        const modalNameInput = document.getElementById('modal-jersey-name');
+        const modalNumberInput = document.getElementById('modal-jersey-number');
+        
+        function openProductById(id) {
+            const productData = URUN_KATALOGU.find(p => p.id === id);
+            if(!productData) return;
+            
+            // Fiyatı belirle (İndirimli mi normal mi)
+            const activePrice = (productData.indirimliFiyat && productData.indirimliFiyat < productData.price) 
+                ? productData.indirimliFiyat 
+                : productData.price;
+
+            // Objeyi modal'ın anlayacağı formata çevir
+            const modalData = {
+                id: productData.id,
+                name: productData.name,
+                price: activePrice,
+                category: productData.category,
+                front: productData.imgFront,
+                back: productData.imgBack || productData.imgFront // Arka resim yoksa ön resmi kullan
+            };
+
+            openProductModal(modalData);
+        }
+
+        function openProductModal(productData) {
+            currentProduct = productData;
+            selectedSize = null;
+            isPersonalized = false;
+            document.getElementById('enable-personalization').checked = false;
+            document.getElementById('personalization-inputs').classList.add('hidden', 'opacity-0');
+            modalNameInput.value = '';
+            modalNumberInput.value = '';
+            sizeRadios.forEach(r => r.checked = false);
+            
+            document.getElementById('modal-title').innerText = productData.name;
+            document.getElementById('modal-category').innerText = productData.category.toUpperCase();
+            document.getElementById('modal-price').innerText = '₺' + productData.price.toLocaleString('tr-TR');
+            document.getElementById('modal-product-img').src = productData.front;
+            
+            // --- BEDEN SEÇİMİNİ GİZLEME MANTIĞI ---
+            const sizeSection = document.getElementById('modal-size-section');
+            if (productData.category === 'aksesuar') {
+                sizeSection.classList.add('hidden');
+            } else {
+                sizeSection.classList.remove('hidden');
+            }
+
+            const pSec = document.getElementById('modal-personalization-section');
+            if (productData.category === 'formalar') pSec.classList.remove('hidden'); else pSec.classList.add('hidden');
+
+            document.getElementById('modal-jersey-overlays').classList.add('opacity-0');
+            document.getElementById('modal-product-img').style.filter = "brightness(1)";
+
+            productModal.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeProductModal() { productModal.classList.add('hidden'); }
+
+        function togglePersonalizationInputs() {
+            isPersonalized = document.getElementById('enable-personalization').checked;
+            const inputs = document.getElementById('personalization-inputs');
+            const img = document.getElementById('modal-product-img');
+            const overlays = document.getElementById('modal-jersey-overlays');
+
+            if (isPersonalized) {
+                inputs.classList.remove('hidden');
+                setTimeout(() => inputs.classList.remove('opacity-0'), 10);
+                if(currentProduct.back) {
+                    img.src = currentProduct.back;
+                    overlays.classList.remove('opacity-0');
+                }
+            } else {
+                inputs.classList.add('opacity-0');
+                setTimeout(() => inputs.classList.add('hidden'), 300);
+                img.src = currentProduct.front;
+                overlays.classList.add('opacity-0');
+            }
+        }
+
+        modalNameInput.addEventListener('input', () => {
+            if(isPersonalized) document.getElementById('modal-overlay-name').innerText = modalNameInput.value.trim().toUpperCase();
+        });
+        modalNumberInput.addEventListener('input', () => {
+            if(isPersonalized) document.getElementById('modal-overlay-number').innerText = modalNumberInput.value.trim();
+        });
+
+        function addToCartFromModal() {
+            selectedSize = document.querySelector('input[name="size"]:checked')?.value;
+            if (currentProduct.category !== 'aksesuar' && !selectedSize) return alert("Lütfen bir beden seçiniz.");
+            if (currentProduct.category === 'aksesuar' && !selectedSize) selectedSize = "STD";
+
+            let finalPrice = currentProduct.price;
+            let pData = null;
+
+            if (isPersonalized) {
+                const name = modalNameInput.value.trim();
+                const num = modalNumberInput.value.trim();
+                if(!name || !num) return alert("İsim ve numara giriniz.");
+                finalPrice += 250;
+                pData = { name: name.toUpperCase(), number: num };
+            }
+
+            cart.push({
+                name: currentProduct.name,
+                price: finalPrice,
+                img: currentProduct.front,
+                size: selectedSize,
+                personalization: pData
+            });
+
+            updateCartCount();
+            showToastMsg("Ürün Sepete Eklendi", "Sepetiniz güncellendi.");
+            closeProductModal();
+        }
+
+        // --- CART ---
+        function updateCartCount() {
+            const el = document.getElementById('cart-count');
+            el.innerText = cart.length;
+            if(cart.length > 0) el.classList.remove('opacity-0', 'scale-0');
+            el.classList.remove('animate-bounce');
+            void el.offsetWidth;
+            el.classList.add('animate-bounce');
+        }
+
+        function openCart() {
+            document.getElementById('cart-modal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('cart-panel').classList.remove('translate-x-full'), 10);
+            renderCartItems();
+        }
+
+        function closeCart() {
+            document.getElementById('cart-panel').classList.add('translate-x-full');
+            setTimeout(() => document.getElementById('cart-modal').classList.add('hidden'), 500);
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cart-items-container');
+            container.innerHTML = '';
+            let total = 0;
+
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-500 mt-20 flex flex-col items-center"><i data-lucide="shopping-cart" class="w-12 h-12 mb-4 opacity-20"></i><p>Sepetiniz şu an boş.</p></div>`;
+            } else {
+                cart.forEach((item, index) => {
+                    total += item.price;
+                    let detailHtml = `<span class="text-xs bg-gray-700 px-2 py-1 rounded text-gray-300">Beden: ${item.size}</span>`;
+                    if(item.personalization) {
+                        detailHtml += `<div class="mt-1 text-xs text-gold-500 flex flex-col"><span>İsim: ${item.personalization.name}</span><span>No: ${item.personalization.number}</span></div>`;
+                    }
+                    const el = document.createElement('div');
+                    el.className = 'flex gap-4 items-start bg-onyx-800 p-3 rounded-lg border border-gray-800';
+                    el.innerHTML = `
+                        <div class="w-16 h-16 bg-white/5 rounded overflow-hidden flex-shrink-0"><img src="${item.img}" class="w-full h-full object-cover"></div>
+                        <div class="flex-1"><h4 class="text-sm font-bold text-white leading-tight mb-1">${item.name}</h4><div class="mb-2">${detailHtml}</div><p class="text-white text-sm font-bold">₺${item.price.toLocaleString('tr-TR')}</p></div>
+                        <button onclick="removeFromCart(${index})" class="text-gray-500 hover:text-red-500 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    `;
+                    container.appendChild(el);
+                });
+            }
+            document.getElementById('cart-subtotal').innerText = '₺' + total.toLocaleString('tr-TR');
+            document.getElementById('cart-total').innerText = '₺' + total.toLocaleString('tr-TR');
+            lucide.createIcons();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartCount();
+            renderCartItems();
+        }
+
+        function goToCheckout() {
+            if(cart.length === 0) return alert("Sepetiniz boş!");
+            
+            if(window.checkAuthForCheckout && !window.checkAuthForCheckout()) {
+                closeCart();
+                return;
+            }
+
+            document.getElementById('view-cart').classList.add('hidden');
+            document.getElementById('view-checkout').classList.remove('hidden');
+            document.getElementById('view-success').classList.add('hidden');
+        }
+
+        function backToCart() {
+            document.getElementById('view-checkout').classList.add('hidden');
+            document.getElementById('view-cart').classList.remove('hidden');
+        }
+
+        function processPayment() {
+            const btnText = document.getElementById('pay-btn-text');
+            const spinner = document.getElementById('pay-spinner');
+            const orderTotal = cart.reduce((sum, item) => sum + item.price, 0);
+            const currentCart = [...cart]; 
+
+            btnText.innerText = 'İşleniyor...';
+            spinner.classList.remove('hidden');
+
+            setTimeout(() => {
+                btnText.innerText = 'Ödemeyi Onayla';
+                spinner.classList.add('hidden');
+                
+                if(window.placeOrderLocal) {
+                    window.placeOrderLocal(orderTotal, currentCart);
+                }
+
+                document.getElementById('view-checkout').classList.add('hidden');
+                document.getElementById('view-success').classList.remove('hidden');
+                
+                cart = [];
+                updateCartCount();
+                startTrackingSimulation();
+            }, 2000);
+        }
+
+        function startTrackingSimulation() {
+            const bar = document.getElementById('tracking-bar');
+            const status = document.getElementById('tracking-status');
+            bar.style.width = '0%';
+            status.innerText = "Siparişiniz alındı, hazırlanıyor...";
+            status.className = "text-sm text-gold-500 font-bold animate-pulse";
+
+            setTimeout(() => { bar.style.width = '30%'; status.innerText = "Siparişiniz paketleniyor..."; }, 2000);
+            setTimeout(() => { bar.style.width = '60%'; status.innerText = "Kargoya verildi. Dağıtım merkezinde."; }, 10000);
+            setTimeout(() => { bar.style.width = '85%'; status.innerText = "Kurye dağıtımda. Teslimat bekleniyor."; }, 20000);
+            setTimeout(() => { bar.style.width = '100%'; status.innerText = "Kargo evinize gelmiştir. İyi günlerde kullanın!"; status.className = "text-sm text-green-500 font-bold"; }, 30000);
+        }
+
+        function resetCartUI() {
+            document.getElementById('view-success').classList.add('hidden');
+            document.getElementById('view-checkout').classList.add('hidden');
+            document.getElementById('view-cart').classList.remove('hidden');
+            document.getElementById('tracking-bar').style.width = '0%';
+            document.getElementById('tracking-status').innerText = "Sipariş işleniyor...";
+            renderCartItems();
+        }
+
+        // --- FILTER LOGIC ---
+        function filterProducts(category, btnElement) {
+            const products = document.querySelectorAll('.product-card');
+            const buttons = document.querySelectorAll('.category-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('text-gold-500', 'border-gold-500');
+                if(!btn.classList.contains('text-red-500')) btn.classList.add('text-gray-400', 'border-transparent'); else btn.classList.add('border-transparent');
+            });
+            btnElement.classList.remove('text-gray-400', 'border-transparent');
+            if(!btnElement.classList.contains('text-red-500')) btnElement.classList.add('text-gold-500', 'border-gold-500'); else btnElement.classList.add('border-red-500');
+
+            products.forEach(product => {
+                product.classList.remove('animate-fade-in');
+                void product.offsetWidth;
+                let shouldShow = (category === 'all') || (category === 'indirim' && product.dataset.discount === 'true') || (product.dataset.category && product.dataset.category.includes(category));
+                if (shouldShow) { product.style.display = 'block'; product.classList.add('animate-fade-in'); } else { product.style.display = 'none'; }
+            });
+        }
+
+        // --- NAVBAR SCROLL ---
+        window.addEventListener('scroll', () => {
+            const navbarBg = document.getElementById('navbar-bg');
+            const container = document.getElementById('navbar-container');
+            const logo = document.getElementById('nav-logo');
+            if (window.scrollY > 20) {
+                navbarBg.classList.remove('bg-gradient-to-b', 'from-black/90', 'to-transparent');
+                navbarBg.classList.add('bg-onyx-950/90', 'backdrop-blur-xl', 'shadow-lg');
+                container.classList.remove('py-6'); container.classList.add('py-3');
+                logo.classList.remove('w-20', 'h-20'); logo.classList.add('w-14', 'h-14');
+            } else {
+                navbarBg.classList.add('bg-gradient-to-b', 'from-black/90', 'to-transparent');
+                navbarBg.classList.remove('bg-onyx-950/90', 'backdrop-blur-xl', 'shadow-lg');
+                container.classList.add('py-6'); container.classList.remove('py-3');
+                logo.classList.add('w-20', 'h-20'); logo.classList.remove('w-14', 'h-14');
+            }
+        });
+
+        const mobileMenu = document.getElementById('mobile-menu');
+        function toggleMenu() { mobileMenu.classList.toggle('translate-x-full'); }
+        document.getElementById('mobile-menu-btn').addEventListener('click', toggleMenu);
+        document.getElementById('close-menu-btn').addEventListener('click', toggleMenu);
+    </script>
+</body>
+</html>

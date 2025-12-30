@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haber Merkezi | Marmaraspor Kulübü</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            400: '#F4D03F', 
+                            500: '#D4AF37', 
+                            600: '#B7950B', 
+                            700: '#7D6608',
+                            800: '#584600',
+                        },
+                        onyx: {
+                            700: '#3f3f46', 
+                            800: '#27272a', 
+                            900: '#18181b', 
+                            950: '#09090b', 
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(212, 175, 55, 0.5)',
+                        'glow-strong': '0 0 35px rgba(212, 175, 55, 0.7)',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Scrollbar Özelleştirmesi */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: #52525b #18181b;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #18181b; }
+        ::-webkit-scrollbar-thumb { background: #52525b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
+        
+        /* NAV LINK EFEKTİ */
+        .nav-item {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .nav-item:hover::before {
+            left: 100%;
+        }
+
+        .nav-link-text {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* TEXT GRADIENT METALİK */
+        .text-gradient-gold {
+            background: linear-gradient(to bottom, #F4D03F 0%, #D4AF37 50%, #B7950B 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: #D4AF37; 
+        }
+        @supports (-webkit-background-clip: text) or (background-clip: text) {
+            .text-gradient-gold {
+                color: transparent;
+                text-shadow: 0px 2px 4px rgba(0,0,0,0.3);
+            }
+        }
+
+        /* Haber Kart Efektleri */
+        .news-card {
+            transition: all 0.4s ease;
+        }
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+        }
+        .news-card:hover .news-image {
+            transform: scale(1.05);
+        }
+        .news-card:hover .read-more-line {
+            width: 100%;
+        }
+        
+        /* Filtre Butonu Aktif Durumu */
+        .filter-btn.active {
+            background-color: rgba(212, 175, 55, 0.1);
+            color: #F4D03F;
+            border-color: #D4AF37;
+        }
+
+        /* Pagination Butonu Aktif Durumu */
+        .page-btn.active {
+            background-color: #D4AF37;
+            color: #18181b;
+            border-color: #D4AF37;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Modal Stilleri */
+        #news-modal {
+            transition: opacity 0.3s ease-in-out;
+        }
+        #news-modal.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #news-modal:not(.hidden) {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="bg-onyx-900 text-gray-300 font-sans selection:bg-gold-500 selection:text-onyx-900 overflow-x-hidden flex flex-col min-h-screen">
+
+    <!-- NEWS MODAL (POPUP) -->
+    <div id="news-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closeModal()"></div>
+        
+        <!-- Modal Content -->
+        <div class="relative bg-onyx-800 rounded-2xl border border-gold-500/30 w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col">
+            <!-- Close Button -->
+            <button onclick="closeModal()" class="absolute top-4 right-4 z-20 bg-black/50 hover:bg-gold-500 hover:text-onyx-900 text-white rounded-full p-2 transition-colors">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <!-- Modal Image -->
+            <div class="relative h-64 md:h-96 w-full flex-shrink-0">
+                <img id="modal-image" src="" alt="News Detail" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-onyx-800 to-transparent"></div>
+                <div class="absolute bottom-4 left-6 md:left-10">
+                    <span id="modal-category" class="bg-gold-500 text-onyx-900 text-xs font-black px-3 py-1 uppercase tracking-wider rounded mb-2 inline-block"></span>
+                    <div id="modal-date" class="text-gray-300 text-sm font-mono flex items-center gap-2"></div>
+                </div>
+            </div>
+
+            <!-- Modal Text -->
+            <div class="p-6 md:p-10">
+                <h2 id="modal-title" class="font-heading text-3xl md:text-4xl font-black text-white mb-6 leading-tight"></h2>
+                <div id="modal-content" class="prose prose-invert prose-lg max-w-none text-gray-300 font-light leading-relaxed">
+                    <!-- İçerik JS ile gelecek -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-500 border-b-2 border-gold-500 shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+        <div id="navbar-bg" class="absolute inset-0 bg-gradient-to-b from-black/90 to-transparent transition-all duration-500 -z-10"></div>
+
+        <div class="container mx-auto px-6">
+            <div class="flex justify-between items-center transition-all duration-500 py-6" id="navbar-container">
+                
+                <!-- Logo & Branding -->
+                <a href="../index.html" class="flex items-center gap-5 group relative">
+                    <div class="absolute inset-0 bg-gold-500/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                    <div class="relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                        <img id="nav-logo" src="https://i.hizliresim.com/pxf3135.png" alt="Marmaraspor Logo" class="w-20 h-20 object-contain drop-shadow-glow filter transition-all duration-500">
+                    </div>
+                    <div class="flex flex-col justify-center relative z-10">
+                        <h1 class="font-heading font-black text-4xl leading-[0.85] tracking-tight group-hover:scale-105 transition-transform origin-left">
+                            <span class="text-gradient-gold block drop-shadow-lg">MARMARA</span>
+                        </h1>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="h-[1px] w-4 bg-gold-500/80"></span>
+                            <span class="text-[0.65rem] font-bold tracking-[0.4em] text-gray-300 uppercase group-hover:text-white transition-colors">Spor Kulübü</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-1">
+                    
+                    <a href="../index.html" class="nav-item px-6 py-3 rounded-lg text-sm font-bold uppercase tracking-widest text-gray-200 hover:text-white transition-all group hover:bg-white/5 border border-transparent hover:border-gold-500/30">
+                        <span class="nav-link-text group-hover:text-gold-400 transition-colors">Anasayfa</span>
+                    </a>
+
+                    <div class="relative group h-full">
+                        <button class="nav-item px-6 py-3 rounded-lg text-sm font-bold uppercase tracking-widest text-gray-200 hover:text-white transition-all flex items-center gap-2 group-hover:bg-white/5 border border-transparent hover:border-gold-500/30">
+                            <span class="nav-link-text">Kulüp</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-gold-500 transition-transform group-hover:rotate-180"></i>
+                        </button>
+                        <div class="absolute top-full right-0 w-56 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform -translate-y-2 group-hover:translate-y-0">
+                            <div class="bg-onyx-900/95 backdrop-blur-xl border border-gold-500/30 shadow-glow rounded-xl overflow-hidden">
+                                <a href="../Kulup/Kadro/index.html" class="block px-6 py-4 text-xs font-bold text-gray-400 hover:text-gold-500 hover:bg-white/5 tracking-[0.2em] uppercase transition-colors border-b border-gray-800 flex items-center justify-between group/item">
+                                    Kadro
+                                    <i data-lucide="users" class="w-4 h-4 opacity-0 group-hover/item:opacity-100 transition-opacity text-gold-500"></i>
+                                </a>
+                                <a href="../Kulup/Muze/index.html" class="block px-6 py-4 text-xs font-bold text-gray-400 hover:text-gold-500 hover:bg-white/5 tracking-[0.2em] uppercase transition-colors flex items-center justify-between group/item">
+                                    Müze
+                                    <i data-lucide="trophy" class="w-4 h-4 opacity-0 group-hover/item:opacity-100 transition-opacity text-gold-500"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="index.html" class="nav-item px-6 py-3 rounded-lg text-sm font-bold uppercase tracking-widest text-gray-200 hover:text-white transition-all group hover:bg-white/5 border border-transparent hover:border-gold-500/30">
+                        <span class="nav-link-text group-hover:text-gold-400 transition-colors">Haber</span>
+                    </a>
+                    
+                    <a href="../magaza/index.html" class="ml-4 px-8 py-3 bg-gradient-to-r from-gold-600 to-gold-400 text-onyx-900 text-sm font-black uppercase tracking-widest rounded skew-x-[-10deg] hover:skew-x-0 hover:scale-105 transition-all shadow-[0_0_20px_rgba(212,175,55,0.4)] hover:shadow-[0_0_30px_rgba(212,175,55,0.6)]">
+                        <div class="skew-x-[10deg] group-hover:skew-x-0 flex items-center gap-2">
+                            Mağaza
+                            <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Mobile Btn -->
+                <button id="mobile-menu-btn" class="md:hidden text-gray-100 hover:text-gold-500 transition-colors p-2">
+                    <i data-lucide="menu" class="w-8 h-8 drop-shadow-md"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="fixed inset-0 bg-onyx-950/98 backdrop-blur-2xl z-40 transform translate-x-full transition-transform duration-500 flex flex-col items-center justify-center space-y-8 md:hidden">
+            <button id="close-menu-btn" class="absolute top-8 right-8 text-gray-400 hover:text-gold-500 transition-colors bg-white/5 p-2 rounded-full"><i data-lucide="x" class="w-8 h-8"></i></button>
+            <div class="text-center mb-8">
+                <img src="https://i.hizliresim.com/pxf3135.png" alt="Logo" class="w-20 h-20 mx-auto mb-4 drop-shadow-glow">
+                <h2 class="text-2xl font-heading font-black text-gradient-gold">MARMARA</h2>
+            </div>
+            <nav class="flex flex-col items-center gap-6 w-full px-8">
+                <a href="../index.html" class="w-full text-center py-4 border-b border-gray-800 text-xl font-heading font-bold text-white hover:text-gold-500 transition-colors tracking-widest">ANASAYFA</a>
+                <a href="../Kulup/Kadro/index.html" class="w-full text-center py-4 border-b border-gray-800 text-xl font-heading font-bold text-white hover:text-gold-500 transition-colors tracking-widest">KADRO</a>
+                <a href="../Kulup/Muze/index.html" class="w-full text-center py-4 border-b border-gray-800 text-xl font-heading font-bold text-white hover:text-gold-500 transition-colors tracking-widest">MÜZE</a>
+                <a href="index.html" class="w-full text-center py-4 border-b border-gray-800 text-xl font-heading font-bold text-gold-500 transition-colors tracking-widest">HABER</a>
+                <a href="../magaza/index.html" class="w-full text-center py-4 bg-gold-500 text-onyx-900 font-black text-xl rounded mt-4 hover:bg-gold-400 transition-colors shadow-glow">MAĞAZA</a>
+            </nav>
+        </div>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <header class="relative pt-40 pb-20 bg-onyx-900 overflow-hidden">
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1510051640316-cee39563ddab?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-onyx-900 via-onyx-900/80 to-transparent"></div>
+        
+        <div class="container mx-auto px-6 relative z-10 text-center">
+            <span class="text-gold-500 text-sm font-bold tracking-[0.5em] uppercase border-b border-gold-500/50 pb-2 mb-4 inline-block">MARMARASPOR</span>
+            <h1 class="font-heading text-5xl md:text-7xl font-black text-white tracking-tighter drop-shadow-2xl mb-6">
+                KULÜP <span class="text-gradient-gold">HABERLERİ</span>
+            </h1>
+            <div class="flex flex-wrap justify-center gap-4" id="filter-container">
+                <button onclick="setFilter('all')" class="filter-btn active px-6 py-2 rounded-full border border-gold-500/50 text-gold-400 bg-gold-500/10 hover:bg-gold-500 hover:text-onyx-900 transition-all text-xs font-bold uppercase tracking-widest">Tümü</button>
+                <button onclick="setFilter('Futbol')" class="filter-btn px-6 py-2 rounded-full border border-gray-700 text-gray-400 hover:border-gold-500/50 hover:text-white transition-all text-xs font-bold uppercase tracking-widest">Futbol</button>
+                <button onclick="setFilter('Kulüp')" class="filter-btn px-6 py-2 rounded-full border border-gray-700 text-gray-400 hover:border-gold-500/50 hover:text-white transition-all text-xs font-bold uppercase tracking-widest">Kulüp</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN NEWS CONTENT -->
+    <section class="py-12 bg-onyx-900 flex-grow">
+        <div class="container mx-auto px-6">
+            
+            <!-- FEATURED NEWS (MANŞET - En Güncel Haber) -->
+            <div id="featured-news-container" class="mb-16">
+                <!-- Javascript ile doldurulacak -->
+            </div>
+
+            <div class="w-full h-px bg-gray-800 mb-16"></div>
+
+            <!-- NEWS GRID (Paginated) -->
+            <div id="news-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 min-h-[400px]">
+                <!-- Javascript ile doldurulacak -->
+            </div>
+
+            <!-- Pagination (Sayfalama) -->
+            <div class="flex justify-center mt-16 gap-2" id="pagination-controls">
+                <!-- Javascript ile doldurulacak -->
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-onyx-950 border-t border-gold-500/20 pt-16 pb-8 relative mt-auto">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold-500/50 to-transparent"></div>
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-12">
+                <a href="#" class="flex items-center gap-4 group">
+                    <img src="https://i.hizliresim.com/pxf3135.png" alt="Marmaraspor Logo" class="w-16 h-16 object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500">
+                    <div class="flex flex-col">
+                         <span class="font-heading font-black text-2xl tracking-tight text-gradient-gold drop-shadow-md">MARMARA</span>
+                         <span class="text-[10px] tracking-widest text-gold-500 uppercase">Spor Kulübü</span>
+                    </div>
+                </a>
+            </div>
+            <div class="text-center text-gray-600 text-xs tracking-widest border-t border-gray-900 pt-8">© 2025 MARMARASPOR KULÜBÜ.</div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // --- NAVBAR SCROLL & MOBILE MENU ---
+        const navbar = document.getElementById('navbar');
+        const navbarBg = document.getElementById('navbar-bg');
+        const navbarContainer = document.getElementById('navbar-container');
+        const navLogo = document.getElementById('nav-logo');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                navbarBg.classList.remove('bg-gradient-to-b', 'from-black/90', 'to-transparent');
+                navbarBg.classList.add('bg-onyx-950/90', 'backdrop-blur-xl', 'shadow-lg');
+                navbarContainer.classList.remove('py-6');
+                navbarContainer.classList.add('py-3');
+                navLogo.classList.remove('w-20', 'h-20');
+                navLogo.classList.add('w-14', 'h-14');
+            } else {
+                navbarBg.classList.add('bg-gradient-to-b', 'from-black/90', 'to-transparent');
+                navbarBg.classList.remove('bg-onyx-950/90', 'backdrop-blur-xl', 'shadow-lg');
+                navbarContainer.classList.add('py-6');
+                navbarContainer.classList.remove('py-3');
+                navLogo.classList.add('w-20', 'h-20');
+                navLogo.classList.remove('w-14', 'h-14');
+            }
+        });
+
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        function toggleMenu() { mobileMenu.classList.toggle('translate-x-full'); }
+        mobileMenuBtn.addEventListener('click', toggleMenu);
+        closeMenuBtn.addEventListener('click', toggleMenu);
+
+
+        // --- HABER VERİSİ (DATA) ---
+        // Tarih formatı: YYYY-MM-DD (Sıralama için önemli)
+        const newsData = [
+            {
+                id: 1,
+                title: "Kulübümüzden Yeni Sponsorluk Anlaşmaları: 18 Milyon Euro Gelir",
+                date: "2025-11-11",
+                category: "Kulüp",
+                summary: "Kulübümüz, Uludağ, Adidas ve Pizzabuls ile yapılan yeni sponsorluk anlaşmaları kapsamında toplam 18 milyon Euro’luk maddi destek sağladı.",
+                content: "<p>Kulübümüz, yeni sponsorlarla yapılan anlaşmalar doğrultusunda maddi ve manevi açıdan önemli bir güç kazanmıştır. Gerçekleştirilen anlaşmalar sayesinde kulübümüzün bütçesine toplam 18 milyon Euro katkı sağlanması beklenmektedir.</p> <p>Yeni sponsorlarımız ve anlaşma bedelleri şu şekildedir: </p> <p style = color:#F4D03F;> <strong> <b> ULUDAG: 10 MİLYON EURO </b> </strong> </p> <p style = color:#F4D03F;> <strong> <b> ADİDAS: 5 MİLYON EURO </b> </strong> </p> <p style = color:#F4D03F;> <strong> <b> PİZZABULS: 3 MİLYON EURO.  </b> </strong> </p> <p> Bu sponsorluk anlaşmalarının, kulübümüzün sportif başarı hedeflerine ve kurumsal gelişimine önemli katkılar sağlaması hedeflenmektedir. </p>",
+                image: "https://i.hizliresim.com/pxf3135.png"
+            },
+            {
+                id: 2,
+                title: "ArtishKing ile Yeni Sözleşme İmzalandı",
+                date: "2025-11-14",
+                category: "Kulüp",
+                summary: "Kulübümüz, ArtishKing ile yeni bir sözleşmeye imza atarken, anlaşmanın mali detayları da netleşti.",
+                content: "<p> <b> <strong> Kulübümüz, ArtishKing ile yeni bir sözleşme konusunda anlaşmaya varmıştır. Yapılan sözleşme kapsamında ArtishKing, aylık 2,5 milyon Euro maaş alacaktır. Ayrıca oyuncuya 5,5 milyon Euro tutarında imza bonusu ödenecektir. </b> </strong> </p>",
+                image: "https://drive.google.com/thumbnail?id=1ncL13Vi9BR48L8rAD6VTfM2eYTIRVcxT&sz=s800"
+            },
+             {
+                id: 3,
+                title: "Ambatukam ile Yeni Sözleşme İmzalandı",
+                date: "2025-11-15",
+                category: "Kulüp",
+                summary: "Kulübümüz, Ambatukam ile yeni bir sözleşmeye imza atarken, anlaşmanın mali şartları da açıklandı.",
+                content: "<p> <b> <strong> Kulübümüz, Ambatukam ile yapılan görüşmeler sonucunda yeni sözleşme konusunda anlaşmaya varmıştır. İmzalanan sözleşmeye göre Ambatukam, aylık 9 milyon Euro maaş alacaktır. Ayrıca oyuncuya 45 milyon Euro tutarında imza parası ödenecektir.  </strong> </b> </p> <p> Bu anlaşmanın, kulübümüzün sportif hedefleri doğrultusunda önemli bir yatırım olduğu ifade edilmektedir. </p>",
+                image: "  https://drive.google.com/thumbnail?id=1EXdllPtDcPwcEQ6QHUqKeoiGuNagVBFT&sz=s800"
+            },
+           
+            {
+                id: 4,
+                title: "Jorge Jesus ile Yollar Ayrıldı",
+                date: "2025-11-16",
+                category: "Kulüp",
+                summary: "Kulüp Başkanımız Fikri Belalı, Jorge Jesus’un görevden alınmasının ardından açıklama yaptı.",
+                content: "<p> Kulübümüz, teknik direktörlük görevini yürüten Jorge Jesus ile yapılan değerlendirmeler sonucunda karşılıklı anlaşarak yollarını ayırmıştır. </p> <p>Kulüp Başkanımız Fikri Belalı, alınan karara ilişkin yaptığı açıklamada şu ifadelere yer vermiştir: </p> <p style = color:#F4D03F;> <b> <strong> “Jorge Jesus ile beklentilerimiz doğrultusunda bir çalışma süreci yürüttük. Kendisine gerekli desteği sağladık; ancak performans anlamında hedeflediğimiz noktaya ulaşamadık. Bu doğrultuda yolları ayırmanın kulübümüz adına en doğru karar olduğuna karar verdik. Yeni teknik direktörümüzle ilgili çalışmalarımız devam etmektedir ve en kısa sürede kamuoyuyla paylaşılacaktır.” </b> </strong> </p> <p> Marmaraspor olarak Jorge Jesus’a kulübümüze verdiği emekler için teşekkür eder, kariyerinin devamında başarılar dileriz. </p>",
+                image: "https://tmssl.akamaized.net//images/foto/galerie/jorge-jesus-fenerbahce-2022-2023-1670845100-98385.jpg"
+            },
+            {
+                id: 5,
+                title: "Hoşgeldin! Rıza Çalımbay!",
+                date: "2025-11-17",
+                category: "Kulüp",
+                summary: "Kulübümüz Marmaraspor, teknik direktörlük görevi için deneyimli teknik adam Rıza Çalımbay ile anlaşmaya varmıştır.",
+                content: "<p> Kulübümüz Marmaraspor’da teknik direktörlük görevine Rıza Çalımbay getirilmiştir. </p>  <p> Marmaraspor Kulüp Başkanı Fikri Belali konuyla ilgili yaptığı açıklamada şu ifadelere yer verdi: </p> <p> <b> <strong>  “Rıza Çalımbay’ı teknik direktörlük görevine getirmemizin en önemli sebeplerinden biri, sahip olduğu tecrübe ve başarı geçmişidir. Ayrıca Türk Milli Takımı’nda görev almış olması, takımımıza milli bilinç ve yüksek motivasyon kazandıracaktır.”  </b> </strong> </p> <p> Kulübümüz, yeni teknik direktörümüz Rıza Çalımbay’a hoş geldin der, görevinde başarılar diler. </p>",
+                image: "https://halkinsesikibriscom.teimg.com/crop/1280x720/halkinsesikibris-com/uploads/2025/03/riza-1.jpg"
+            },
+            {
+                id: 6,
+                title: "Başkan Adayı Vedat Hesaplı’dan Marmaraspor’un Geleceğine Dair Açıklamalar",
+                date: "2025-11-20",
+                category: "Kulüp",
+                summary: "Marmaraspor Başkan Adayı Vedat Hesaplı, kulübün mali durumu, teknik direktör süreci ve yönetim anlayışına ilişkin değerlendirmelerde bulundu.",
+                content: "<p> Marmaraspor Başkan Adayı Vedat Hesaplı, kulübün mevcut durumu ve geleceğe yönelik planları hakkında önemli açıklamalarda bulundu. </p> <p> Hesaplı, yeni proje ve kararlar alınmadan önce kulübün mali yapısının detaylı şekilde değerlendirilmesi gerektiğini vurgulayarak,  <p> <b> <strong> “Yeni projeler ve kararlar öncesinde mali durumumuzdaki açıkları ve mevcut imkânlarımızı net şekilde analiz edeceğiz. Bu değerlendirmelere göre hareket edeceğiz,”  </strong> </b> ifadelerini kullandı. </p> </p> <br>   <p>  Teknik direktör konusu hakkında da görüşlerini paylaşan Hesaplı, mevcut teknik direktör Rıza Çalımbay’ın bir süre daha görevde kalmasının doğru olacağını belirtti. Ancak bu sürecin performansa dayalı olarak değerlendirilmesi gerektiğini ifade eden Hesaplı, <strong> <b> “Belirli bir sürenin ardından performans analizi yapılmalı ve gerekirse değişim yoluna gidilmelidir. Göreve gelecek her teknik direktör, Marmaraspor’un başarısını her şeyin önünde tutan bir isim olacaktır,” </b> </strong> dedi.</p>  <br> <p> Açıklamalarında altyapıya da özel bir parantez açan Hesaplı, <strong> <b> kulübün sürdürülebilir başarısı için altyapının geliştirilmesinin öncelikleri arasında yer aldığını belirtti. </b> </strong> </p> <br> <p> Mevcut yönetimle ilgili eleştirilerde de bulunan Vedat Hesaplı, Marmaraspor’un şeffaf bir yönetim anlayışına ihtiyaç duyduğunu vurguladı. Hesaplı, <strong> <b>  “Kulübün bir kişi tarafından, adeta kişisel bir şirket gibi yönetilmesi kabul edilemez. Taraftarlardan ve kamuoyundan uzak bir yönetim anlayışı sergileniyor. Ayrıca kulüp kaynaklarının nasıl ve nereye harcandığı konusunda açıklama yapılmaması Marmaraspor camiası adına rahatsız edici bir durumdur,” </b> </strong> şeklinde konuştu. </p>",
+                image: "https://i.hizliresim.com/pjwlkf2.png" 
+            },
+            {
+                id: 7,
+                title: "Başkanımız Fikri Belali’den Kamuoyuna Açıklama",
+                date: "2025-11-21",
+                category: "Kulüp",
+                summary: "Marmaraspor Başkanı Fikri Belali, son günlerde yapılan açıklamalara ve kulübün geleceğine dair hedeflere ilişkin değerlendirmelerde bulundu.",
+                content: "<p> <b> Marmaraspor Kulüp Başkanı Fikri Belali, kulübün mevcut durumu ve geleceğe yönelik planlamalar hakkında açıklamalarda bulundu. </b> </p> <br> <p> Başkan Belali, yapılan eleştirilere ilişkin olarak, <b> <strong> “Vedat Hesaplı’nın sözlerini dikkate almıyorum. Tüm enerjimi, doğru kararlar alarak Marmaraspor’un başarısını sağlayacak planlar üzerinde yoğunlaştırıyorum,” </b> </strong> ifadelerini kullandı. </p> <br> <p> Açıklamalarında taraftar desteğine de değinen Belali, <br> <strong> “Taraftarlarımızın ve kamuoyumuzun desteğini hissetmekten mutluluk duyuyorum. Bu destek, hedeflerimize ulaşma yolunda bizim için önemli bir motivasyon kaynağıdır,” </br> </strong> dedi </p> <br> <p> Kulübün mali ve idari yapısına ilişkin değerlendirmelerde bulunan Fikri Belali, Marmaraspor’un kaynaklarının kulübün menfaatleri doğrultusunda kullanılmaya devam edeceğini vurgulayarak, <b> <strong> “Marmaraspor’daki tüm kaynakları gerektiği şekilde kullanmayı sürdürecek, takımımızı daha üst hedeflere taşımak için çalışmalarımıza kararlılıkla devam edeceğiz,” </b> </strong> şeklinde konuştu. </p>  ",
+                image: "https://artishh.github.io/MarmarasporTR/kulup/haber/Resim/Baskan.jpg"
+            },
+            {
+                id: 8,
+                title: "Başkan Adayı Vedat Hesaplı: “Marmaraspor’da Şeffaf ve Taraftar Odaklı Bir Dönem Başlatacağız”",
+                date: "2025-11-22",
+                category: "Kulüp",
+                summary: "Marmaraspor Başkan Adayı Vedat Hesaplı, yaklaşan seçim süreci, mevcut yönetim, mali yapı, transfer politikası ve kulübün geleceğine dair projeleri hakkında açıklamalarda bulundu.",
+               content: "<p>Soru: <b><strong>Seçim yaklaşıyor başkanım. Vaatleriniz ve Marmaraspor’un mevcut başkanı Fikri Belali hakkında neler söylemek istersiniz?</strong></b><br><br></p><p>Vedat Hesaplı: <b><strong>Fikri Belali’nin başarısızlığı ortada. Kulübü ciddi bir borç yükünün altına soktu ve bu durumu yıldız transferlerle örtmeye çalıştı. Ancak sonuçlar bunu gizleyemiyor. Bizim vizyonumuz tamamen farklı. Taraftar odaklı, şeffaf ve hesap verebilir bir yönetim anlayışıyla Marmaraspor’u yönetmek istiyoruz.</strong></b><br><br></p><p>Soru: <b><strong>Peki siz ne yapacaksınız?</strong></b><br><br></p><p>Vedat Hesaplı: <b><strong>Şeffaflaşma ilk adımımız olacak. Üyelerin ve kamuoyunun bilgilendirilmesi, kulüp hesaplarının denetlenmesi önceliğimiz. Belali’nin yaptığı gibi star transferler yerine takımımızın ihtiyacına uygun, genç ve yetenekli sporcuları bünyemize katacağız.</strong></b><br><br></p><p>Soru: <b><strong>Artishking ile Ambatukam’ın yeni sözleşmesini gördünüz mü? Ne düşünüyorsunuz? Sizce de çok büyük paralar değil mi?</strong></b><br><br></p><p>Vedat Hesaplı: <b><strong>Evet, sözleşme detaylarına baktım. Bence rakamlar biraz abartılı. Özellikle Ambatukam’ın sözleşmesi dikkatimi çekti. Kulübün kaynaklarını akılcı bir şekilde kullanması gerekiyor.</strong></b><br><br></p><p>Soru: <b><strong>Siz başkan seçildiğinizde ne yapacaksınız?</strong></b><br><br></p><p>Vedat Hesaplı: <b><strong>Öncelikle kulübün iç yapılarını iyileştireceğim. Üyelerle ve taraftarlarla ortak bir noktada buluşacağım. Şeffaf bir şekilde hesap vereceğim. Gösterişçi adımlar yerine, takımımızın temel ihtiyaçlarını karşılayacak kararlar vereceğim.</strong></b><br><br></p><p>Soru: <b><strong>Son olarak, MarmaraStore için ne yapacaksınız ve stadyum için bir şeyler yapacak mısınız? Stadyum oldukça eski ve bakımsız görünüyor.</strong></b><br><br></p><p>Vedat Hesaplı: <b><strong>Stadyumun bakımını üstleneceğim ve yenilemeyi de planlıyorum. Tribünleri modernize edeceğim, seyirci memnuniyetini artıracağım. MarmaraStore için de düzenleme yapacağım; taraftarlarımızın ihtiyaç duyacağı daha fazla ürün çeşidi sunacağım.</strong></b><br><br></p>",
+                image: "https://i.hizliresim.com/z0zhl60.png"
+            },
+
+            {
+                id: 9,
+                title: "Başkan Fikri Belali’den Seçim Süreci ve Kulübün Geleceğine Dair Açıklamalar",
+                date: "2025-11-23",
+                category: "Kulüp",
+               summary: "Marmaraspor Kulüp Başkanı Fikri Belali, yaklaşan başkanlık seçimleri öncesinde rakibi Vedat Hesaplı, taraftar beklentileri, MarmaraStore fiyatları, stadyum projeleri ve kulübün geleceğine yönelik hedefleri hakkında değerlendirmelerde bulundu.",
+                content: "<p>Soru: <b><strong>Seçim yaklaşıyor başkanım. Vaatleriniz ve Marmaraspor’un başkan adayı Vedat Hesaplı için neler söylemek istersiniz?</strong></b><br><br></p><p>Fikri Belali: <b><strong>Vedat Hesaplı bir amatör. Marmaraspor’un hak etmediği biri. Bizim gibi büyük bir kulübü bu kadar basite indirmesini kabul edemem.</strong></b><br><br></p><p>Soru: <b><strong>Taraftara neler vaat ediyorsunuz?</strong></b><br><br></p><p>Fikri Belali: <b><strong>Taraftardan tek bir şey istiyorum: Bizi dinlesinler. Biz, Marmaraspor için doğru olan her şeyi yapmaya hazırız. Ayrıca taraftarlarımızın kulübe ne kadar sahip çıkacağını görmek istiyoruz. Biz bir aileyiz ve hep birlikte başarılı olacağız.</strong></b><br><br></p><p>Soru: <b><strong>Taraftarlar MarmaraStore fiyatlarından şikâyetçi. Çok pahalı olduğunu söylüyorlar. Bu konuda ne diyeceksiniz?</strong></b><br><br></p><p>Fikri Belali: <b><strong>Evet, bunun farkındayız ve bu durum bizi de rahatsız ediyor. Taraftarlarımıza en iyi alışveriş deneyimini sunmak istiyoruz ancak bazı dış etkenler fiyatları etkiliyor. Korkarım ki bu durum sadece başlangıç.</strong></b><br><br></p><p>Soru: <b><strong>Ne gibi dış etkenlerden bahsediyorsunuz?</strong></b><br><br></p><p>Fikri Belali: <b><strong>Ekonomi, vergi oranları, döviz kurlarındaki artış ve benzeri faktörler maliyetleri doğrudan etkiliyor. Bu durum fiyatlara yansıyor.</strong></b><br><br></p><p>Soru: <b><strong>Stadyumun oldukça eski olduğu söyleniyor. Yenilemeyi düşünüyor musunuz?</strong></b><br><br></p><p>Fikri Belali: <b><strong>Evet, kesinlikle yeni bir stadyuma ihtiyacımız var. Mevcut stadyumumuz günümüz şartları için yeterli değil. Yeni bir stadyum yapmak bizim için bir hayal değil, gerçekleştirmeyi planladığımız bir projedir.</strong></b><br><br></p><p>Soru: <b><strong>Artishking ve Ambatukam’ın sözleşmeleri neden bu kadar yüksek? Yaşları da göz önüne alındığında eleştiriler var.</strong></b><br><br></p><p>Fikri Belali: <b><strong>Bu oyuncular bizim için çok önemli. Yaşları yüksek olabilir ancak sahada hâlâ üst düzey katkı sağlıyorlar. Tecrübeleri ve yetenekleri tartışılmaz. Bu nedenle sözleşmeleri bu seviyede.</strong></b><br><br></p><p>Soru: <b><strong>Tekrar başkan seçilirseniz hangi projeleri hayata geçireceksiniz?</strong></b><br><br></p><p>Fikri Belali: <b><strong>Önceliğim kulübün finansal yapısını daha da güçlendirmek olacak. Mevcut sponsorlukları geliştirmek ve yeni sponsorlarla anlaşmalar yapmak istiyoruz. İkinci olarak altyapımıza yatırım yapacağız. Genç yeteneklerin gelişimi sadece kulübümüz için değil, ülke futbolu için de çok önemli.</strong></b><br><br></p><p>Soru: <b><strong>Son olarak, rakibiniz sizi kulübü batırmakla suçluyor ve bazı taraftarlar istifa çağrıları yapıyor. Ne söylemek istersiniz?</strong></b><br><br></p><p>Fikri Belali: <b><strong>Bu tamamen bir saçmalık. Yıllardır Marmaraspor’u ayakta tutmak için çalışıyorum. Vedat Hesaplı ise somut bir plan ortaya koymadan konuşuyor. Taraftarlarımız bu tür söylemlere prim vermemeli.</strong></b><br><br></p>",
+                image: "https://artishh.github.io/MarmarasporTR/kulup/haber/Resim/Baskan.jpg"
+            },
+            {
+                id: 10,
+                title: "Rıza Çalımbay’dan Takıma Dair Açıklama",
+                date: "2025-11-24",
+                category: "Kulüp",
+                summary: "Marmaraspor Teknik Direktörü Rıza Çalımbay, takımın durumu ve gelecek hedefleri hakkında kısa bir değerlendirmede bulundu.",
+                content: "Marmarasporumuzun teknik direktörü Rıza Çalımbay, açıklamalarda bulundu: <b> <strong> 'Takıma yeni geldim ve takıma alıştım. Oyuncular çok iyi. İnanıyoruz, iyi yerlere gideceğiz. Takım artık daha disiplinli. Eski oyuncuları gönderdim, özellikle kadınsı görünen korkutucu kel adamı.' </br> </strong>",
+                image: "https://cdnuploads.aa.com.tr/uploads/Contents/2023/06/07/thumbs_b_c_808b2e8c79268714f4a14f8b8fdaa27e.jpg"
+            },
+            {
+                id: 11,
+                title: "Marmaraspor’da Başkanlık Seçimleri Başladı",
+                date: "2025-12-01",
+                category: "Kulüp",
+                summary: "Marmaraspor’da başkanlık seçim süreci resmen başladı. Mevcut başkan Fikri Belali ile başkan adayı Vedat Hesaplı, seçim günü dolayısıyla açıklamalarda bulundu.",
+               content: "<p><b><strong>Marmarasporumuzun başkanlık seçimleri bugün itibarıyla başlamıştır. Mevcut başkanımız Fikri Belali ile başkan adayımız Vedat Hesaplı, seçim günü dolayısıyla açıklamalarda bulundu.</strong></b><br><br></p><p><b><strong>Fikri Belali:</strong></b> Bugün Marmaraspor için çok önemli bir gün. Seçim sonuçları kulübümüzün geleceğini şekillendirecek. Taraftarlarımıza ve bize destek veren herkese çok teşekkür ediyorum. Rakiplerimize ise şunu söylemek istiyorum: Bu kulübün sahibi biziz.<br><br></p><p><b><strong>Vedat Hesaplı:</strong></b> Evet, bugün seçim günü ve heyecanlıyım. Ancak sorumluluk duygusunun daha ağır bastığını söylemek gerekir. Taraftarlarımıza derin saygılarımı sunuyorum, seçim sürecinde gösterdikleri destek ve ilgi için teşekkür ediyorum. Bu seçimin Marmaraspor için yeni bir dönemin başlangıcı olacağına inanıyorum. Rakibime karşı herhangi bir şey söylemek istemiyorum. Herkesin bu sürece saygılı ve yasalara uygun şekilde yaklaşmasını temenni ediyorum.<br><br></p>",
+                image: "https://img.freepik.com/premium-vektor/oy-sandigi-posta-vektor-ikonu-anket-oy-pusulasini-oy-sandigina-koyar-oy-verme-ve-secim_909360-664.jpg"
+            },
+            {
+                id: 12,
+                title: "Marmaraspor’da Başkanlık Seçimi Sonuçlandı",
+                date: "2025-12-02",
+                category: "Kulüp",
+                summary: "Marmaraspor’da yapılan başkanlık seçimleri sonucunda mevcut başkan Fikri Belali, yeniden başkanlığa seçildi.",
+               content: "<p><b><strong>Marmarasporumuzda gerçekleştirilen başkanlık seçimleri sonuçlanmıştır.</strong></b><br><br></p><p><b><strong>Yapılan seçimlerin ardından, mevcut başkanımız  yeniden Marmaraspor Başkanlığı görevine seçilmiştir.</strong></b><br><br></p><p><b><strong>Kulübümüz adına seçim sürecine katılan tüm üyelere ve camiamıza teşekkür eder, başkanımız Fikri Belali’ye yeni döneminde başarılar dileriz.</strong></b><br><br></p>",
+                image: "https://i.hizliresim.com/fzrcmo1.png"
+            },
+            {
+                id: 13,
+                title: "Vedat Hesaplı’dan Seçim Sonrası Açıklama",
+                date: "2025-12-02",
+                category: "Kulüp",
+                summary: "Başkan adayı Vedat Hesaplı, Marmaraspor’da tamamlanan başkanlık seçimlerinin ardından sürece ve kulübün geleceğine dair değerlendirmelerde bulundu.",
+                content: "<p><b><strong>Marmaraspor Başkan Adayı , başkanlık seçimlerinin ardından kamuoyuna açıklamalarda bulundu.</strong></b><br><br></p><p><b><strong>Vedat Hesaplı:</strong></b> Öncelikle kaybetmenin üzücü olduğunu söylemek isterim. Ancak bu durum demokrasinin bir parçasıdır ve bunu kabullenmekten başka bir seçeneğimiz yok. ’nın açıklamalarını not ettim ve saygıyla karşılıyorum, ancak katılmadığımı da belirtmek isterim. Kulübün gerçek sahibi taraftarlardır ve onlara bağlı kalmak için her şeyi yapmalıyız.<br><br></p><p><b><strong>Vedat Hesaplı:</strong></b> Kaybetmiş olmaktan üzgünüz fakat Marmaraspor için elimizi taşın altına koymaya devam edeceğiz. Kulübümüzün geleceğinde iyilikler görmek adına elimden gelenin fazlasını yapacağım. Bu seçim süreci bize çok şey öğretti ve önemli bir deneyim kazandırdı.<br><br></p><p><b><strong>Vedat Hesaplı:</strong></b> Gelecekte yeniden aday olup olmayacağıma dair şu an net bir kararım yok. Ancak her koşulda Marmaraspor’u düşünmeye ve kulübümüz için çalışmaya devam edeceğim. Hepimiz için daha iyi bir gelecek diliyorum.<br><br></p><p><b><strong>Vedat Hesaplı:</strong></b> Fikri Belali’ye karşı herhangi bir nefret ya da kırgınlığım yok. Bu seçim süreci tamamen demokratik bir şekilde ilerledi ve sonuçlarına saygı duyuyorum. Taraftarlarımıza da bir kez daha destekleri için derin saygı ve minnetlerimi sunuyorum. Her zaman onların desteğiyle yolumuza devam edeceğiz.<br><br></p>",
+                image: "https://i.hizliresim.com/z0zhl60.png"
+            },
+            {
+                id: 14,
+               title: "Başkan Fikri Belali’den Seçim Sonrası Açıklama",
+                date: "2025-12-02",
+                category: "Kulüp",
+               summary: "Marmaraspor Başkanı Fikri Belali, başkanlık seçimlerinin ardından teşekkür mesajı yayımlayarak yeni döneme dair hedeflerini paylaştı.",
+               content: "<p><b><strong>Marmaraspor Başkanımız , başkanlık seçimlerinin ardından kamuoyuna açıklamalarda bulundu.</strong></b><br><br></p><p><b><strong>Fikri Belali:</strong></b> Teşekkür ederim. Verdiğimiz mücadelenin sonunda halkın desteğine kavuştuğumuz için mutluluk duyuyorum. Vedat Hesaplı’nın teşekkür mesajını da gördüm. Her şeye rağmen böyle bir açıklama yapmasını takdir ediyorum.<br><br></p><p><b><strong>Fikri Belali:</strong></b> Bundan sonraki süreçte bizi yoğun bir dönem bekliyor. Kulübün idari ve sportif yapısını iyileştirmemiz gerekiyor. Bu noktada sponsorlarımızın desteğini yanımızda hissetmek bizim için çok önemli.<br><br></p><p><b><strong>Fikri Belali:</strong></b> Öncelikle kulübü daha profesyonel bir düzene kavuşturmayı hedefliyoruz. Organizasyon yapısı, oyuncu sözleşmeleri ve antrenman programları gibi konularda çeşitli düzenlemeler yapacağız. Ayrıca sponsorlarımızı da bu sürecin aktif bir parçası haline getirmek istiyoruz.<br><br></p><p><b><strong>Fikri Belali:</strong></b> Tüm bu hedefler doğrultusunda taraftarlarımızın desteğini her zamankinden daha fazla yanımızda hissetmek istiyoruz. Onları maçlara gelmeye, takımımızın başarısı için bizimle birlikte olmaya davet ediyorum.<br><br></p>",
+                image: "https://artishh.github.io/MarmarasporTR/kulup/haber/Resim/Baskan.jpg"
+            },
+            {
+                id: 15,
+                title: "Başkanımız Fikri Belali’den Yeni Sezon ve Sponsorluk Açıklaması",
+                date: "2025-12-27",
+                category: "Kulüp",
+                summary: "Marmarasporumuzun Başkanı Fikri Belali, yeni sezon öncesinde stadyum projesi, altyapı çalışmaları ve kulübün mali yapısını güçlendirecek sponsorluk anlaşmaları hakkında açıklamalarda bulundu.",
+                content: "<p><b><strong>Marmaraspor Başkanımız , kulübün yeni sezon hedefleri ve mali yapısına ilişkin önemli açıklamalarda bulundu.</strong></b><br><br></p><p><b><strong>Fikri Belali:</strong></b> Bu sezon için yeni bir stadyum yapımı ve kulübümüzün altyapısını güçlendirmeye yönelik projeler üzerinde yoğun şekilde çalışıyoruz. Aynı zamanda sponsorlarımızdan gelen desteklerle Marmaraspor’u borç yükünden kurtararak mali açıdan sağlam bir yapıya kavuşturmayı hedefliyoruz.<br><br></p><p><b><strong>Fikri Belali:</strong></b> Şu anda birçok markayla sponsorluk görüşmelerimiz devam ediyor. Yeni sezona kadar en az iki büyük sponsorla anlaşma sağlamış olacağız. Bu süreç kulübümüz için çok kritik bir adım.<br><br></p><p><b><strong>Fikri Belali:</strong></b> Bu kapsamda  ve  ile yeni sponsorluk anlaşmaları imzaladık. Cola ile aylık 10 milyon euro, ayrıca reklam çekimleri için ekstra 5 milyon euroluk bir anlaşmaya vardık. Eti ile ise 5 milyon euro karşılığında sponsorluk anlaşması sağladık.<br><br></p>",
+                image: "https://artishh.github.io/MarmarasporTR/kulup/haber/Resim/Baskan.jpg"
+            },
+            {
+                id: 16,
+                title: "Marmaraspor Akademisi Resmen Duyuruldu! Başkan Fikri Belalı’dan Geleceğe Yatırım",
+                date: "2025-12-30",
+                category: "Kulüp",
+                summary: "Marmaraspor Başkanı Fikri Belalı, kulübün altyapı vizyonunun en önemli adımı olan Marmaraspor Akademisi’nin açıldığını duyurdu. 120 milyon TL’lik yatırımla hayata geçirilen akademi, genç yetenekleri profesyonel futbol seviyesine taşımayı hedefliyor.",
+                content: "<p> Marmaraspor Başkanı <b> <strong> Fikri Belalı,</b> </strong> kulübün geleceğine yönelik önemli bir projeyi kamuoyuna duyurdu. Marmaraspor Akademisi’nin resmi olarak faaliyete geçtiğini açıklayan Belalı, genç futbolcuların gelişimine büyük önem verdiklerini vurguladı. </p> <br> <br> <p>  Başkan Belalı açıklamasında şu ifadelere yer verdi: </p> <br> <p> <b> <strong> “Marmaraspor ailesi olarak gençlerin yetişmesi ve yetenekli futbolcuların gelişimi için akademi açılışımızı gerçekleştirdik. Toplam 120 milyon TL maliyetle hayata geçirilen bu akademi, kulübümüzün geleceğinin temellerini oluşturacak. Genç yetenekleri profesyonel seviyeye taşıyarak kulübümüzü daha da güçlendireceğiz.” </b> </strong> </p> <br> <br> <p> Akademiye katılacak gençler için aylık ücretin <b> 2.000 TL </b> olarak belirlendiğini ifade eden Belalı, bu ücret karşılığında sporcuların düzenli olarak eğitmen kontrolünde eğitim alacağını söyledi. Ayrıca başarılı ve yetenekli futbolcuların gelişimlerinin yakından takip edileceğini ve ihtiyaç duyulan alanlarda gerekli desteklerin sağlanacağını belirtti. </p> <br> <p> Kulüp olarak genç sporculara aylık <b> 1.000 TL’lik ek destek </b> sunmayı planladıklarını da açıklayan Belalı, bu desteğin ayakkabı, çanta, mayo gibi giyim eşyaları ve spor malzemeleri için kullanılabileceğini ifade etti. </p> <br> <p> Gençlerin fiziksel gelişimi ve sağlığının da öncelikleri arasında olduğunu vurgulayan Marmaraspor Başkanı, akademide <b> <strong> diyetisyen, sağlıklı beslenme eğitimi veren personel, spor salonu ve profesyonel antrenörlerin </b> </strong> görev yapacağını belirtti. Ayrıca akademi bünyesindeki <b> <strong> yemekhane hizmetinin ücretsiz </b> </strong> olacağını söyleyen Belalı, genç sporcuların hem sağlıklarını korumayı hem de performanslarını artırmayı hedeflediklerini sözlerine ekledi. </p>",
+                image: "https://i.hizliresim.com/glkjcik.png"
+            },
+        ];
+
+        // --- GLOBAL DEĞİŞKENLER ---
+        let currentFilter = 'all';
+        let currentPage = 1;
+        const itemsPerPage = 6;
+        let filteredNews = [];
+
+        // --- MODAL (POPUP) FONKSİYONLARI ---
+        const modal = document.getElementById('news-modal');
+        
+        function openModal(newsId) {
+            const newsItem = newsData.find(item => item.id === newsId);
+            if (!newsItem) return;
+
+            document.getElementById('modal-image').src = newsItem.image;
+            document.getElementById('modal-title').innerText = newsItem.title;
+            document.getElementById('modal-category').innerText = newsItem.category;
+            
+            // Tarih Formatlama
+            const dateObj = new Date(newsItem.date);
+            const formattedDate = dateObj.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('modal-date').innerHTML = `<i data-lucide="calendar" class="w-4 h-4 text-gold-500"></i> ${formattedDate}`;
+            
+            document.getElementById('modal-content').innerHTML = newsItem.content;
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Arka plan scrollu engelle
+            lucide.createIcons(); // Modal içindeki ikonları oluştur
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto'; // Scrollu geri aç
+        }
+
+        // ESC tuşu ile modal kapatma
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape") {
+                closeModal();
+            }
+        });
+
+        // --- HABER FİLTRELEME VE SIRALAMA ---
+        function setFilter(category) {
+            currentFilter = category;
+            currentPage = 1; // Filtre değişince sayfa 1'e dön
+            updateFilterButtons();
+            renderApp();
+        }
+
+        function updateFilterButtons() {
+            const btns = document.querySelectorAll('.filter-btn');
+            btns.forEach(btn => {
+                const btnCategory = btn.innerText === "Tümü" ? "all" : btn.innerText;
+                if (btnCategory === currentFilter || (currentFilter === 'all' && btnCategory === 'Tümü')) {
+                    btn.classList.add('active', 'border-gold-500/50', 'text-gold-400', 'bg-gold-500/10');
+                    btn.classList.remove('border-gray-700', 'text-gray-400');
+                } else {
+                    btn.classList.remove('active', 'border-gold-500/50', 'text-gold-400', 'bg-gold-500/10');
+                    btn.classList.add('border-gray-700', 'text-gray-400');
+                }
+            });
+        }
+
+        // --- RENDER (EKRANA ÇİZME) MANTIĞI ---
+        function renderApp() {
+            // 1. Filtrele
+            let tempNews = newsData;
+            if (currentFilter !== 'all') {
+                tempNews = newsData.filter(item => item.category === currentFilter);
+            }
+
+            // 2. Sırala (En Yeni En Üstte)
+            tempNews.sort((a, b) => new Date(b.date) - new Date(a.date));
+            filteredNews = tempNews;
+
+            // 3. Manşet ve Grid Ayrımı
+            // Eğer filtrelenmiş haber varsa, en yenisini Manşet yap, kalanları Grid yap.
+            const featuredContainer = document.getElementById('featured-news-container');
+            const gridContainer = document.getElementById('news-grid');
+            
+            featuredContainer.innerHTML = '';
+            gridContainer.innerHTML = '';
+
+            if (filteredNews.length === 0) {
+                gridContainer.innerHTML = '<p class="text-center text-gray-500 col-span-3">Bu kategoride haber bulunmamaktadır.</p>';
+                document.getElementById('pagination-controls').innerHTML = '';
+                return;
+            }
+
+            // En güncel haberi al (Manşet)
+            // NOT: Sayfalama mantığında manşet hep sabit en yeni kalabilir veya
+            // sayfalama manşeti de etkileyebilir. Kullanıcı "page 2'de farklı haberler" dediği için
+            // Manşet alanını "En Son Haber" olarak sabit tutalım, alt tarafı sayfalayalım.
+            // VEYA tüm listeyi sayfalayalım. Kullanıcı deneyimi açısından en iyisi:
+            // Manşet = Listenin 0. elemanı.
+            // Grid = Listenin geri kalanı.
+            
+            // Kullanıcı isteğine göre: "2025 aralık page 1, ekim page 2". 
+            // Yani tüm liste sayfalara bölünmeli.
+            // Biz Manşet alanına o anki sayfanın ilk haberini koyabiliriz ya da 
+            // Manşet'i global en yeni yapıp, gridi sayfalayabiliriz.
+            // Basitlik ve "Page 2 farklı haber" isteği için:
+            // Manşet'i SADECE 1. Sayfada gösterelim. Diğer sayfalarda sadece grid olsun veya
+            // Manşet alanı her zaman en yeni haber olsun, grid sayfalansın.
+            
+            // Karar: Manşet alanı her zaman "Filtrenin En Yenisi" olsun (sabit).
+            // Grid alanı ise Geriye kalanları sayfalasın (slice 1'den başlar).
+            // Bu sayede Page 1 ve Page 2 grid içerikleri tamamen farklı olur.
+
+            const featuredNews = filteredNews[0];
+            const remainingNews = filteredNews.slice(1); // Manşet hariç diğerleri
+
+            // Manşeti Renderla
+            renderFeatured(featuredNews);
+
+            // Sayfalama Hesaplamaları (Kalan haberler üzerinden)
+            const totalItems = remainingNews.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            
+            // Geçerli sayfa kontrolü
+            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageItems = remainingNews.slice(start, end);
+
+            // Grid Renderla
+            renderGrid(pageItems);
+
+            // Pagination Renderla
+            renderPagination(totalPages);
+            
+            lucide.createIcons();
+        }
+
+        function renderFeatured(news) {
+            const container = document.getElementById('featured-news-container');
+            const dateObj = new Date(news.date);
+            const formattedDate = dateObj.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+            const html = `
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center group cursor-pointer" onclick="openModal(${news.id})">
+                    <div class="relative overflow-hidden rounded-xl border border-gold-500/20 group h-[400px] shadow-glow">
+                        <img src="${news.image}" alt="${news.title}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+                        <div class="absolute top-4 left-4 bg-gold-500 text-onyx-900 text-xs font-black px-3 py-1 uppercase tracking-wider">Son Dakika</div>
+                    </div>
+                    <div class="flex flex-col justify-center">
+                        <div class="flex items-center gap-3 mb-4 text-gray-400 text-sm">
+                            <i data-lucide="calendar" class="w-4 h-4 text-gold-500"></i>
+                            <span>${formattedDate}</span>
+                            <span class="w-1 h-1 bg-gray-600 rounded-full"></span>
+                            <span class="text-gold-400 uppercase tracking-wider font-bold text-xs">${news.category}</span>
+                        </div>
+                        <h2 class="font-heading text-3xl md:text-5xl font-black text-gray-100 mb-6 leading-tight group-hover:text-gold-500 transition-colors">
+                            ${news.title}
+                        </h2>
+                        <p class="text-gray-400 text-lg mb-8 font-light border-l-2 border-gray-700 pl-4">
+                            ${news.summary}
+                        </p>
+                        <button class="inline-flex items-center gap-2 text-gold-500 font-bold tracking-widest uppercase hover:text-white transition-colors group/btn">
+                            Haberi Oku
+                            <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover/btn:translate-x-1"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function renderGrid(items) {
+            const container = document.getElementById('news-grid');
+            if (items.length === 0) {
+                 // Eğer manşet harici haber kalmadıysa boş bırakma, en azından bir mesaj veya boşluk olabilir
+                 return;
+            }
+
+            items.forEach(news => {
+                const dateObj = new Date(news.date);
+                const formattedDate = dateObj.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+                const html = `
+                    <article class="news-card bg-onyx-800 rounded-xl overflow-hidden border border-gray-800 group relative flex flex-col h-full cursor-pointer" onclick="openModal(${news.id})">
+                        <div class="h-60 overflow-hidden relative flex-shrink-0">
+                            <img src="${news.image}" alt="${news.title}" class="news-image w-full h-full object-cover">
+                            <div class="absolute top-4 right-4 bg-onyx-900/80 backdrop-blur text-gray-200 text-xs font-bold px-3 py-1 rounded border border-gray-700">${news.category}</div>
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                            <div class="text-xs text-gold-500 font-mono mb-2 uppercase">${formattedDate}</div>
+                            <h3 class="font-heading text-xl font-bold text-gray-100 mb-3 group-hover:text-gold-400 transition-colors line-clamp-2">
+                                ${news.title}
+                            </h3>
+                            <p class="text-gray-400 text-sm mb-4 line-clamp-3 flex-grow">
+                                ${news.summary}
+                            </p>
+                            <div class="text-sm font-bold text-white flex items-center gap-2 group-hover:text-gold-500 transition-colors mt-auto">
+                                Devamını Oku
+                                <span class="read-more-line h-[1px] w-4 bg-gold-500 transition-all duration-300 group-hover:w-8"></span>
+                            </div>
+                        </div>
+                    </article>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        function renderPagination(totalPages) {
+            const container = document.getElementById('pagination-controls');
+            container.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            // Prev Button
+            const prevBtn = document.createElement('button');
+            prevBtn.className = `w-10 h-10 rounded border ${currentPage === 1 ? 'border-gray-800 text-gray-600 cursor-not-allowed' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gold-500'} flex items-center justify-center transition-all`;
+            prevBtn.innerHTML = '<i data-lucide="chevron-left" class="w-4 h-4"></i>';
+            prevBtn.onclick = () => { if(currentPage > 1) changePage(currentPage - 1); };
+            container.appendChild(prevBtn);
+
+            // Page Numbers
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                if (i === currentPage) {
+                    btn.className = 'w-10 h-10 rounded bg-gold-500 text-onyx-900 font-bold border border-gold-500 shadow-glow flex items-center justify-center';
+                } else {
+                    btn.className = 'w-10 h-10 rounded border border-gray-700 text-gray-400 hover:text-white hover:border-gold-500 font-bold transition-all flex items-center justify-center';
+                }
+                btn.innerText = i;
+                btn.onclick = () => changePage(i);
+                container.appendChild(btn);
+            }
+
+            // Next Button
+            const nextBtn = document.createElement('button');
+            nextBtn.className = `w-10 h-10 rounded border ${currentPage === totalPages ? 'border-gray-800 text-gray-600 cursor-not-allowed' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gold-500'} flex items-center justify-center transition-all`;
+            nextBtn.innerHTML = '<i data-lucide="chevron-right" class="w-4 h-4"></i>';
+            nextBtn.onclick = () => { if(currentPage < totalPages) changePage(currentPage + 1); };
+            container.appendChild(nextBtn);
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            renderApp();
+            // Gridin başına scroll et (Manşet sabit kalır, grid değişir)
+            const gridTop = document.getElementById('news-grid').offsetTop - 100;
+            window.scrollTo({ top: gridTop, behavior: 'smooth' });
+        }
+
+        // --- INIT ---
+        renderApp();
+
+    </script>
+</body>
+</html>
